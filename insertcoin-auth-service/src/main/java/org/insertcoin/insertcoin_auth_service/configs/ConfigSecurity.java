@@ -44,7 +44,13 @@ public class ConfigSecurity {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signin", "/auth/signup").permitAll()
+                        .requestMatchers(
+                                "/auth/signin",
+                                "/auth/signup",
+                                "/auth/verify-email",
+                                "/auth/validate-code",
+                                "/auth/forgot-password"
+                        ).permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/auth/admin/**").authenticated()
                         .anyRequest().authenticated()

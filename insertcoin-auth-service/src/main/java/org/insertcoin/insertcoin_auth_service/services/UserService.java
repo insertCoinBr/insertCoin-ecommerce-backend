@@ -1,8 +1,10 @@
 package org.insertcoin.insertcoin_auth_service.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.insertcoin.insertcoin_auth_service.components.CustomUserDetails;
 import org.insertcoin.insertcoin_auth_service.components.JwtUtil;
 import org.insertcoin.insertcoin_auth_service.dtos.SignupDTO;
+import org.insertcoin.insertcoin_auth_service.dtos.UserResponseDTO;
 import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
 import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 import org.insertcoin.insertcoin_auth_service.repositories.RoleRepository;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -101,5 +105,23 @@ public class UserService implements UserDetailsService {
 
         return true;
     }
+
+    public UserResponseDTO findUserById(UUID id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));//preciso arrumar isso
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getActive(),
+                user.getRoles()
+                        .stream()
+                        .map(RoleEntity::getName)
+                        .collect(Collectors.toSet())
+        );
+    }
+
+
 
 }

@@ -1,10 +1,14 @@
 package org.insertcoin.insertcoin_auth_service.controllers;
 
 import org.insertcoin.insertcoin_auth_service.dtos.*;
+import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
+import org.insertcoin.insertcoin_auth_service.entities.VerificationType;
 import org.insertcoin.insertcoin_auth_service.services.EmailVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 import org.insertcoin.insertcoin_auth_service.services.UserService;
@@ -30,7 +34,7 @@ public class AuthController {
     public ResponseEntity<UserResponseDTO> signup(
             @RequestBody SignupDTO dto
     ) throws Exception {
-        if (!emailVerificationService.isVerified(dto.email())) {
+        if (!emailVerificationService.isVerified(dto.email(), VerificationType.VERIFY_EMAIL)) {
             throw new IllegalArgumentException("E-mail não foi verificado.");
         }
         UserEntity user = userService.createUser(dto);
@@ -73,7 +77,7 @@ public class AuthController {
         String code = String.format("%06d", new Random().nextInt(999999));
 
         try {
-            String result = emailVerificationService.createOrUpdateVerification(email, code);
+            String result = emailVerificationService.createOrUpdateVerification(email, code, VerificationType.VERIFY_EMAIL);
 
             if ("WAIT".equals(result)) {
                 return ResponseEntity
@@ -105,8 +109,11 @@ public class AuthController {
     ) {
         String email = request.get("email");
         String code = request.get("code");
+        String type = request.get("type");
 
-        boolean valid = emailVerificationService.validateCode(email, code);
+        VerificationType verificationType = VerificationType.valueOf(type.toUpperCase());
+
+        boolean valid = emailVerificationService.validateCode(email, code, verificationType);
 
         if (!valid) {
             return ResponseEntity
@@ -123,7 +130,7 @@ public class AuthController {
         ));
     }
 
-    @PostMapping("/forgot-password")
+    @PostMapping("/reset-password")
     public ResponseEntity<UpdatePasswordResponseDTO> updatePassword(
             @RequestBody UpdatePasswordRequestDTO request
     ) {
@@ -131,7 +138,7 @@ public class AuthController {
         String newPassword = request.newPassword();
 
         try {
-            boolean isEmailVerified = emailVerificationService.isEmailVerified(email);
+            boolean isEmailVerified = emailVerificationService.isVerified(email, VerificationType.FORGOT_PASSWORD);
 
             if (!isEmailVerified) {
                 return ResponseEntity
@@ -167,6 +174,80 @@ public class AuthController {
                     ));
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponseDTO> getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = authentication.getName();
+
+        try {
+            UserEntity user = userService.findByEmail(email);
+
+            UserProfileResponseDTO response = new UserProfileResponseDTO(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getActive(),
+                    user.getPoint() != null ? user.getPoint() : 0,
+                    user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (UsernameNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<VerifyEmailResponseDTO> forgotPassword(
+            @RequestBody Map<String, String> request
+    ) {
+        String email = request.get("email");
+
+        if (!userService.existsByEmail(email)) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new VerifyEmailResponseDTO(
+                            "E-mail não encontrado no sistema.",
+                            email
+                    ));
+        }
+
+        String code = String.format("%06d", new Random().nextInt(999999));
+
+        try {
+            String result = emailVerificationService.createOrUpdateVerification(email, code, VerificationType.FORGOT_PASSWORD);
+
+            if ("WAIT".equals(result)) {
+                return ResponseEntity
+                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(new VerifyEmailResponseDTO(
+                                "Aguarde 1 minuto antes de solicitar um novo código.",
+                                email
+                        ));
+            }
+
+            return ResponseEntity.ok(new VerifyEmailResponseDTO(
+                    "Código de recuperação enviado com sucesso.",
+                    email
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new VerifyEmailResponseDTO(
+                            "Erro ao gerar ou enviar o código de recuperação.",
+                            email
+                    ));
+        }
+    }
+
 
 
 }

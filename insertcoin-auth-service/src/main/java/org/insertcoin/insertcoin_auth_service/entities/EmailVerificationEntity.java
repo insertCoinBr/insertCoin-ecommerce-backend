@@ -14,7 +14,7 @@ public class EmailVerificationEntity {
     @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String email;
 
     @Column(nullable = false, length = 6)
@@ -28,6 +28,10 @@ public class EmailVerificationEntity {
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private VerificationType type;
 
     public UUID getId() {
         return id;
@@ -75,6 +79,14 @@ public class EmailVerificationEntity {
 
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public VerificationType getType() {
+        return type;
+    }
+
+    public void setType(VerificationType type) {
+        this.type = type;
     }
 }
 

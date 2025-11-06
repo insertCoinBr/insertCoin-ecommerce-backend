@@ -23,12 +23,11 @@ public class CustomUserDetails implements UserDetails {
         user.getRoles().forEach(role -> {
             role.getPermissions().forEach(permission -> {
                 authorities.add(new SimpleGrantedAuthority(permission.getName()));
-                System.out.println("Authorities carregadas: " + authorities);
             });
         });
 
         user.getRoles().forEach(role ->
-                authorities.add(new SimpleGrantedAuthority(role.getName()))
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()))
         );
 
         return authorities;

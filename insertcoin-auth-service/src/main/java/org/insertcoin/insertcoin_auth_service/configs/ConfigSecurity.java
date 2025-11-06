@@ -49,6 +49,7 @@ public class ConfigSecurity {
                                 "/auth/signup",
                                 "/auth/verify-email",
                                 "/auth/validate-code",
+                                "/auth/reset-password",
                                 "/auth/forgot-password"
                         ).permitAll()
                         .requestMatchers("/error").permitAll()

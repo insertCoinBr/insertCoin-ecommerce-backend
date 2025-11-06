@@ -2,6 +2,7 @@ package org.insertcoin.insertcoin_auth_service.services;
 
 import jakarta.transaction.Transactional;
 import org.insertcoin.insertcoin_auth_service.entities.EmailVerificationEntity;
+import org.insertcoin.insertcoin_auth_service.entities.VerificationType;
 import org.insertcoin.insertcoin_auth_service.repositories.EmailVerificationRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +19,14 @@ public class EmailVerificationService {
     }
 
     @Transactional
-    public String createOrUpdateVerification(String email, String code) {
-        Optional<EmailVerificationEntity> existingOpt = repository.findByEmail(email);
+    public String createOrUpdateVerification(String email, String code, VerificationType type) {
+        Optional<EmailVerificationEntity> existingOpt = repository.findByEmailAndType(email, type);
 
         if (existingOpt.isPresent()) {
             EmailVerificationEntity existing = existingOpt.get();
 
             if (existing.getCreatedAt() != null &&
                     existing.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(1))) {
-
                 return "WAIT";
             }
 
@@ -41,40 +41,32 @@ public class EmailVerificationService {
         EmailVerificationEntity newVerification = new EmailVerificationEntity();
         newVerification.setEmail(email);
         newVerification.setCode(code);
+        newVerification.setType(type);
         newVerification.setVerified(false);
         newVerification.setCreatedAt(LocalDateTime.now());
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(10));
-
         repository.save(newVerification);
         return "CREATED";
     }
 
+    @Transactional
+    public boolean validateCode(String email, String code, VerificationType type) {
+        Optional<EmailVerificationEntity> opt = repository.findByEmailAndType(email, type);
+        if (opt.isEmpty()) return false;
 
-    public boolean validateCode(String email, String code) {
-        Optional<EmailVerificationEntity> optional = repository.findByEmail(email);
-        if (optional.isEmpty()) return false;
+        EmailVerificationEntity entity = opt.get();
 
-        EmailVerificationEntity verification = optional.get();
+        if (!entity.getCode().equals(code)) return false;
+        if (entity.getExpiresAt().isBefore(LocalDateTime.now())) return false;
 
-        if (verification.isVerified()) return false;
-        if (verification.getExpiresAt().isBefore(LocalDateTime.now())) return false;
-        if (!verification.getCode().equals(code)) return false;
-
-        verification.setVerified(true);
-        repository.save(verification);
+        entity.setVerified(true);
+        repository.save(entity);
         return true;
     }
 
-    public boolean isVerified(String email) {
-        return repository.findByEmail(email)
+    public boolean isVerified(String email, VerificationType type) {
+        return repository.findByEmailAndType(email, type)
                 .map(EmailVerificationEntity::isVerified)
                 .orElse(false);
-    }
-
-    public boolean isEmailVerified(String email) {
-        EmailVerificationEntity verification = repository.findByEmail(email)
-                .orElse(null);
-
-        return verification != null && verification.isVerified();
     }
 }

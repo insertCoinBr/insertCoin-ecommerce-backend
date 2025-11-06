@@ -1,8 +1,9 @@
 package org.insertcoin.insertcoin_auth_service.controllers;
 
 import org.insertcoin.insertcoin_auth_service.dtos.*;
-import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
+import org.insertcoin.insertcoin_auth_service.entities.PermissionEntity;
 import org.insertcoin.insertcoin_auth_service.entities.VerificationType;
+import org.insertcoin.insertcoin_auth_service.services.EmailService;
 import org.insertcoin.insertcoin_auth_service.services.EmailVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 import org.insertcoin.insertcoin_auth_service.services.UserService;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,11 +25,13 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationConfiguration authConfig;
     private final EmailVerificationService emailVerificationService;
+    private final EmailService emailService;
 
-    public AuthController(UserService userService, AuthenticationConfiguration authConfig, EmailVerificationService emailVerificationService) {
+    public AuthController(UserService userService, AuthenticationConfiguration authConfig, EmailVerificationService emailVerificationService, EmailService emailService) {
         this.userService = userService;
         this.authConfig = authConfig;
         this.emailVerificationService = emailVerificationService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/signup")
@@ -87,6 +91,8 @@ public class AuthController {
                                 email
                         ));
             }
+
+            emailService.sendVerificationEmail(email, code);
 
             return ResponseEntity.ok(new VerifyEmailResponseDTO(
                     "Code sent successfully.",
@@ -186,13 +192,23 @@ public class AuthController {
         try {
             UserEntity user = userService.findByEmail(email);
 
+            Set<String> authoritiesRoles = user.getRoles().stream()
+                    .map(role -> "ROLE_" + role.getName())
+                    .collect(Collectors.toSet());
+
+            Set<String> authoritiesPermissions = user.getRoles().stream()
+                    .flatMap(role -> role.getPermissions().stream())
+                    .map(PermissionEntity::getName)
+                    .collect(Collectors.toSet());
+
             UserProfileResponseDTO response = new UserProfileResponseDTO(
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
                     user.getActive(),
                     user.getPoint() != null ? user.getPoint() : 0,
-                    user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())
+                    authoritiesRoles,
+                    authoritiesPermissions
             );
 
             return ResponseEntity.ok(response);
@@ -232,6 +248,8 @@ public class AuthController {
                                 email
                         ));
             }
+
+            emailService.sendPasswordResetEmail(email, code);
 
             return ResponseEntity.ok(new VerifyEmailResponseDTO(
                     "Código de recuperação enviado com sucesso.",

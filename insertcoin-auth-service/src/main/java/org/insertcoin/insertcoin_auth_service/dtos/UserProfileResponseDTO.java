@@ -9,5 +9,6 @@ public record UserProfileResponseDTO(
         String email,
         boolean active,
         int point,
-        Set<String> roles
+        Set<String> roles,
+        Set<String> permissions
 ) {}

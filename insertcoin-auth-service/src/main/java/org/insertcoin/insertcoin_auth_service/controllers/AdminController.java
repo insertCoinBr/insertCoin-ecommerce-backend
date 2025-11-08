@@ -103,4 +103,32 @@ public class AdminController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTS_ADMIN')")
+    @PutMapping("/clients/update/{id}")
+    public ResponseEntity<UpdateClientResponseDTO> updateClient(
+            @PathVariable UUID id,
+            @RequestBody UpdateClientRequestDTO request
+    ) {
+        try {
+            boolean updated = userService.updateClient(id, request);
+
+            if (!updated) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new UpdateClientResponseDTO("Client not found."));
+            }
+
+            return ResponseEntity.ok(
+                    new UpdateClientResponseDTO("Client updated successfully.")
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UpdateClientResponseDTO(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new UpdateClientResponseDTO("Error updating client."));
+        }
+    }
+
+
 }

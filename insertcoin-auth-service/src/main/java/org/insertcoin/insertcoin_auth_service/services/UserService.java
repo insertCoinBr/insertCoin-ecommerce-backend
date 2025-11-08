@@ -135,6 +135,12 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllByRolesAndEmailContaining(roles, email, pageable);
     }
 
+    public boolean hasAdminPermission(UserEntity user) {
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .anyMatch(permission -> permission.getName().contains("ADMIN"));
+    }
+
     @Transactional
     public boolean updateEmployee(UUID id, UpdateEmployeeRequestDTO request) {
         Optional<UserEntity> optionalUser = userRepository.findById(id);
@@ -145,14 +151,11 @@ public class UserService implements UserDetailsService {
 
         UserEntity user = optionalUser.get();
 
-        boolean hasAdminPermission = user.getRoles().stream()
-                .flatMap(role -> role.getPermissions().stream())
-                .anyMatch(permission -> permission.getName().contains("ADMIN"));
+        boolean hasAdminPermission = hasAdminPermission(user);
 
         if (!hasAdminPermission) {
             throw new IllegalArgumentException("You can only update admin accounts.");
         }
-
 
         if (request.name() != null && !request.name().isBlank()) {
             user.setName(request.name());
@@ -168,6 +171,38 @@ public class UserService implements UserDetailsService {
 
             user.getRoles().clear();
             user.getRoles().add(newRole);
+        }
+
+        if (request.active() != null) {
+            user.setActive(request.active());
+        }
+
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean updateClient(UUID id, UpdateClientRequestDTO request) {
+        Optional<UserEntity> optionalUser = userRepository.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
+
+        UserEntity user = optionalUser.get();
+
+        boolean hasAdminPermission = hasAdminPermission(user);
+
+        if (hasAdminPermission) {
+            throw new IllegalArgumentException("You cannot update admin accounts.");
+        }
+
+        if (request.name() != null) {
+            user.setName(request.name());
+        }
+
+        if (request.points() != null) {
+            user.setPoint(request.points());
         }
 
         if (request.active() != null) {

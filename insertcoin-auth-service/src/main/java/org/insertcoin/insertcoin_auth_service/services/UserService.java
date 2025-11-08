@@ -1,14 +1,18 @@
 package org.insertcoin.insertcoin_auth_service.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.insertcoin.insertcoin_auth_service.components.CustomUserDetails;
 import org.insertcoin.insertcoin_auth_service.components.JwtUtil;
-import org.insertcoin.insertcoin_auth_service.dtos.SignupDTO;
-import org.insertcoin.insertcoin_auth_service.dtos.UserResponseDTO;
+import org.insertcoin.insertcoin_auth_service.dtos.*;
 import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
 import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 import org.insertcoin.insertcoin_auth_service.repositories.RoleRepository;
 import org.insertcoin.insertcoin_auth_service.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,10 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,6 +123,59 @@ public class UserService implements UserDetailsService {
         );
     }
 
+    public Page<UserEmailDTO> searchEmployees(String email, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        List<String> roles = Arrays.asList("MANAGER_STORE", "COMMERCIAL");
+        return userRepository.findAllByRolesAndEmailContaining(roles, email, pageable);
+    }
 
+    public Page<UserEmailDTO> searchClient(String email, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("email").ascending());
+        List<String> roles = List.of("CLIENT");
+        return userRepository.findAllByRolesAndEmailContaining(roles, email, pageable);
+    }
+
+    @Transactional
+    public boolean updateEmployee(UUID id, UpdateEmployeeRequestDTO request) {
+        Optional<UserEntity> optionalUser = userRepository.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
+
+        UserEntity user = optionalUser.get();
+
+        boolean hasAdminPermission = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .anyMatch(permission -> permission.getName().contains("ADMIN"));
+
+        if (!hasAdminPermission) {
+            throw new IllegalArgumentException("You can only update admin accounts.");
+        }
+
+
+        if (request.name() != null && !request.name().isBlank()) {
+            user.setName(request.name());
+        }
+
+        if (request.password() != null && !request.password().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.password()));
+        }
+
+        if (request.role() != null && !request.role().isBlank()) {
+            RoleEntity newRole = roleRepository.findByName(request.role())
+                    .orElseThrow(() -> new EntityNotFoundException("Role not found: " + request.role()));
+
+            user.getRoles().clear();
+            user.getRoles().add(newRole);
+        }
+
+        if (request.active() != null) {
+            user.setActive(request.active());
+        }
+
+        userRepository.save(user);
+        return true;
+    }
 
 }

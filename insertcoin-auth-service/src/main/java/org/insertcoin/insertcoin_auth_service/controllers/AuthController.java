@@ -187,9 +187,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String email = authentication.getName();
-
         try {
+            String email = authentication.getName();
             UserEntity user = userService.findByEmail(email);
 
             Set<String> authoritiesRoles = user.getRoles().stream()
@@ -265,7 +264,5 @@ public class AuthController {
                     ));
         }
     }
-
-
 
 }

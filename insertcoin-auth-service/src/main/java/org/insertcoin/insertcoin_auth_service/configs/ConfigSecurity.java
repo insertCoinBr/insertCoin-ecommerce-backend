@@ -23,8 +23,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(prePostEnabled = true)
 public class ConfigSecurity {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+
+    private final CustomUserDetailsService userDetailsService;
+
+    public ConfigSecurity(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -56,7 +60,6 @@ public class ConfigSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 🔓 Endpoints públicos
                         .requestMatchers(
                                 "/auth/signin",
                                 "/auth/signup",
@@ -73,7 +76,6 @@ public class ConfigSecurity {
                                 "/docs/**",
                                 "/error"
                         ).permitAll()
-                        // 🔒 Endpoints protegidos
                         .requestMatchers("/auth/admin/**").authenticated()
                         .anyRequest().authenticated()
                 )

@@ -1,0 +1,119 @@
+version: "3.9"
+
+volumes:
+  db-data:
+
+services:
+
+  # -------------------------------
+  insertcoin-discovery-service:
+    build:
+      context: ./insertcoin-discovery-service
+    image: insertcoin-discovery-service:latest
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # -------------------------------
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/tablesAndData.sql:/docker-entrypoint-initdb.d/tablesAndData.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
+  # -------------------------------
+  insertcoin-auth-service:
+    build:
+      context: ./insertcoin-auth-service
+    image: insertcoin-auth-service:latest
+    depends_on:
+      - db
+      - insertcoin-discovery-service
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://insertcoin-discovery-service:8761/eureka
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8900/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # -------------------------------
+  insertcoin-email-service:
+    build:
+      context: ./insertcoin-email-service
+    image: insertcoin-email-service:latest
+    depends_on:
+      - db
+      - insertcoin-discovery-service
+      - rabbitmq
+      - insertcoin-auth-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://insertcoin-discovery-service:8761/eureka
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # -------------------------------
+  insertcoin-gateway-service:
+    build:
+      context: ./insertcoin-gateway-service
+    image: insertcoin-gateway-service:latest
+    ports:
+      - "8765:8765"
+    depends_on:
+      - insertcoin-discovery-service
+      - insertcoin-auth-service
+      - insertcoin-email-service
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://insertcoin-discovery-service:8761/eureka
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8765/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s

@@ -2,6 +2,7 @@ package org.insertcoin.insertcoin_auth_service.controllers;
 
 import org.insertcoin.insertcoin_auth_service.dtos.*;
 import org.insertcoin.insertcoin_auth_service.entities.PermissionEntity;
+import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
 import org.insertcoin.insertcoin_auth_service.entities.VerificationType;
 import org.insertcoin.insertcoin_auth_service.services.EmailService;
 import org.insertcoin.insertcoin_auth_service.services.EmailVerificationService;
@@ -47,8 +48,10 @@ public class AuthController {
                 user.getName(),
                 user.getEmail(),
                 user.getActive(),
-                user.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet())
+                user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())
         );
+
+        emailService.sendWelcomeEmail(dto.email(), dto.name());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

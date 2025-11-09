@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>Bem-vindo ao InsertCoin</title>
+    <style>
+        [data-ogsc] .background-dark { background-color: #0f0f23 !important; }
+        [data-ogsc] .background-card { background-color: #1a1a3e !important; }
+        [data-ogsc] .background-blue { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%) !important; }
+
+        @media (prefers-color-scheme: dark) {
+            .prevent-dark-mode-override {
+                color-scheme: light !important;
+            }
+        }
+    </style>
+    <!--[if mso]>
+    <style>
+        table { border-collapse: collapse; }
+        .background-dark { background-color: #0f0f23 !important; }
+        .background-card { background-color: #1a1a3e !important; }
+    </style>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #0f0f23; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" class="prevent-dark-mode-override">
+<div style="display: none; max-height: 0; overflow: hidden;">Sua conta InsertCoin foi criada com sucesso!</div>
+<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #0f0f23;" class="background-dark">
+    <tr>
+        <td align="center" style="padding: 40px 0;">
+            <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #1a1a3e; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);" class="background-card">
+                <!-- Header com logo/branding -->
+                <tr>
+                    <td style="padding: 40px 40px 20px 40px; text-align: center; background-color: #2196F3; background-image: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);" class="background-blue">
+                        <table role="presentation" style="margin: 0 auto;">
+                            <tr>
+                                <td style="background-color: rgba(255, 255, 255, 0.15); padding: 15px 30px; border-radius: 50px;">
+                                    <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: 1px;">
+                                        🎮 InsertCoin
+                                    </h1>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Conteúdo principal -->
+                <tr>
+                    <td style="padding: 40px; background-color: #1a1a3e;">
+                        <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 28px; font-weight: 600; text-align: center;">
+                            Bem-vindo(a), <span th:text="${username}">Usuário</span>! 🎉
+                        </h2>
+
+                        <p style="margin: 0 0 30px 0; color: #b8b8d1; font-size: 16px; line-height: 1.6; text-align: center;">
+                            Sua conta no InsertCoin foi criada com sucesso. Estamos muito felizes em ter você conosco!
+                        </p>
+
+                        <!-- Box de mensagem de boas-vindas -->
+                        <table role="presentation" style="width: 100%; margin: 30px 0;">
+                            <tr>
+                                <td style="background-color: #2d2d5f; border: 2px solid #2196F3; border-radius: 12px; padding: 30px; text-align: center;">
+                                    <p style="margin: 0; color: #b8b8d1; font-size: 16px; line-height: 1.5;">
+                                        Comece a explorar e aproveitar tudo que o InsertCoin tem a oferecer! 🚀
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin: 25px 0 0 0; color: #8888a8; font-size: 14px; line-height: 1.5; text-align: center;">
+                            Se você não criou esta conta, por favor ignore este email.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding: 30px 40px; background-color: #0f0f23; border-top: 1px solid #2d2d5f;">
+                        <p style="margin: 0 0 10px 0; color: #666688; font-size: 12px; text-align: center; line-height: 1.5;">
+                            © 2025 InsertCoin. Todos os direitos reservados.
+                        </p>
+                        <p style="margin: 0; color: #555566; font-size: 11px; text-align: center;">
+                            Este é um email automático, por favor não responda.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

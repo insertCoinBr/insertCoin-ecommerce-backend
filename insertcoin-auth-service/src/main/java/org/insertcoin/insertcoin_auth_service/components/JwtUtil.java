@@ -3,14 +3,12 @@ package org.insertcoin.insertcoin_auth_service.components;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import javax.crypto.SecretKey;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
 import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 
 public class JwtUtil {
@@ -28,7 +26,7 @@ public class JwtUtil {
         claims.put("email", user.getEmail());
 
         claims.put("roles", user.getRoles()
-                .stream().map(role -> role.getName()).toList());
+                .stream().map(RoleEntity::getName).toList());
 
         return Jwts.builder()
                 .claims(claims)

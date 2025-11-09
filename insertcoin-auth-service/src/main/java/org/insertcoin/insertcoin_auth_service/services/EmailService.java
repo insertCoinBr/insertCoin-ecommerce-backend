@@ -18,7 +18,7 @@ public class EmailService {
         EmailMessageDTO dto = new EmailMessageDTO();
         dto.setType("VERIFICATION");
         dto.setTo(to);
-        dto.setSubject("Verify your email address - InsertCoin");
+        dto.setSubject("Verifique seu endereço de e-mail - InsertCoin");
         dto.setTemplate("email-verification");
         dto.setVariables(Map.of("code", code));
         publisher.publish(dto);
@@ -28,9 +28,21 @@ public class EmailService {
         EmailMessageDTO dto = new EmailMessageDTO();
         dto.setType("PASSWORD_RESET");
         dto.setTo(to);
-        dto.setSubject("Reset your password - InsertCoin");
+        dto.setSubject("Redefina sua senha - InsertCoin");
         dto.setTemplate("password-reset");
         dto.setVariables(Map.of("code", code));
+        publisher.publish(dto);
+    }
+
+    public void sendWelcomeEmail(String to, String username) {
+        EmailMessageDTO dto = new EmailMessageDTO();
+        dto.setType("WELCOME");
+        dto.setTo(to);
+        dto.setSubject("Bem-vindo(a) ao InsertCoin!");
+        dto.setTemplate("welcome-email");
+        dto.setVariables(Map.of(
+                "username", username
+        ));
         publisher.publish(dto);
     }
 }

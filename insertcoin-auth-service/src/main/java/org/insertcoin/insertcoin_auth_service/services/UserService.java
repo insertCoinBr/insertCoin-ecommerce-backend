@@ -213,4 +213,33 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    @Transactional
+    public void updateSelf(String email, UpdateSelfRequestDTO request) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (request.name() != null && !request.name().isBlank()) {
+            user.setName(request.name());
+        }
+
+        if (request.newPassword() != null && !request.newPassword().isBlank()) {
+            if (request.currentPassword() == null || request.currentPassword().isBlank()) {
+                throw new IllegalArgumentException("Current password is required to change password.");
+            }
+
+            if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("Current password is incorrect.");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.newPassword()));
+        }
+
+        if (request.active() != null) {
+            user.setActive(request.active());
+        }
+
+        userRepository.save(user);
+    }
+
+
 }

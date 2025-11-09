@@ -50,7 +50,8 @@ public class ConfigSecurity {
                                 "/auth/verify-email",
                                 "/auth/validate-code",
                                 "/auth/reset-password",
-                                "/auth/forgot-password"
+                                "/auth/forgot-password",
+                                "/auth/me/update"
                         ).permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/auth/admin/**").authenticated()

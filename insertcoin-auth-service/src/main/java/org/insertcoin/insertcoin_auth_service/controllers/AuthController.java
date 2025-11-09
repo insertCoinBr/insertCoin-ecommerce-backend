@@ -265,4 +265,33 @@ public class AuthController {
         }
     }
 
+    @PutMapping("/me/update")
+    public ResponseEntity<UpdateSelfResponseDTO> updateSelf(
+            Authentication authentication,
+            @RequestBody UpdateSelfRequestDTO request
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new UpdateSelfResponseDTO("Unauthorized access."));
+        }
+
+        try {
+            String email = authentication.getName();
+            userService.updateSelf(email, request);
+            return ResponseEntity.ok(new UpdateSelfResponseDTO("Profile updated successfully."));
+        }
+        catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new UpdateSelfResponseDTO(e.getMessage()));
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new UpdateSelfResponseDTO(e.getMessage()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new UpdateSelfResponseDTO("Error updating profile."));
+        }
+    }
+
 }

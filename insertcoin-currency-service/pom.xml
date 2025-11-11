@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.InsertCoin</groupId>
-    <artifactId>currency-service</artifactId>
+    <artifactId>insertcoin-currency-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>currency-service</name>
     <description>currency-service</description>

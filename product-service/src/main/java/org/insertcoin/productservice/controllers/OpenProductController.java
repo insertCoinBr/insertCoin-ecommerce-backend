@@ -1,0 +1,52 @@
+package org.insertcoin.productservice.controllers;
+
+import org.insertcoin.productservice.dtos.ProductResponseDTO;
+import org.insertcoin.productservice.mappers.ProductMapper;
+import org.insertcoin.productservice.services.ProductService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/products")
+public class OpenProductController {
+
+    private final ProductService productService;
+    private final ProductMapper productMapper;
+
+    public OpenProductController(ProductService productService, ProductMapper productMapper) {
+        this.productService = productService;
+        this.productMapper = productMapper;
+    }
+
+    // -------------------------------
+    // GET /products?curr=BRL
+    // -------------------------------
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getProducts(
+            @RequestParam(defaultValue = "BRL") String curr) {
+
+        var entities = productService.findAllWithCurrency(curr);
+        var response = entities.stream()
+                .map(productMapper::toResponseDTO)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    // -------------------------------
+// POST /products/rating/{gameId}
+// -------------------------------
+    @PostMapping("/rating/{gameId}")
+    public ResponseEntity<ProductResponseDTO> addRating(
+            @PathVariable String gameId,
+            @RequestBody RatingDTO body) {
+
+        var updated = productService.addRating(gameId, body.rating());
+        return ResponseEntity.ok(productMapper.toResponseDTO(updated));
+    }
+
+
+    // Corpo esperado: { "rating": double }
+    public record RatingDTO(Double rating) {}
+}

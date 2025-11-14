@@ -99,7 +99,7 @@ public class CurrencyController {
 
         // Usa a última cotação retornada
         return response.getValue()
-                .get(response.getValue().size() - 1)
+                .getLast()
                 .getCotacaoVenda();
     }
 }

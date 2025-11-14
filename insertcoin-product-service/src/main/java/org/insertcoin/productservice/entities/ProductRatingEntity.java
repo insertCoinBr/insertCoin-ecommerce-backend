@@ -1,6 +1,8 @@
 package org.insertcoin.productservice.entities;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -8,18 +10,23 @@ import java.util.UUID;
 public class ProductRatingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_product", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "id_product")
     private ProductEntity product;
 
-    @Column(nullable = false)
     private Double rating;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public ProductEntity getProduct() {
@@ -37,4 +44,13 @@ public class ProductRatingEntity {
     public void setRating(Double rating) {
         this.rating = rating;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
+

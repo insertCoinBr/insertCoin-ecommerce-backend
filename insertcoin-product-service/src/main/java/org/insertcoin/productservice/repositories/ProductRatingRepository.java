@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProductRatingRepository extends JpaRepository<ProductRatingEntity, UUID> {
-    List<ProductRatingEntity> findByProductUuid(UUID productId);
+    List<ProductRatingEntity> findByProductId(UUID productId);
 }

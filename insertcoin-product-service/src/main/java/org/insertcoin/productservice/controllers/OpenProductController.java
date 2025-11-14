@@ -20,6 +20,15 @@ public class OpenProductController {
         this.productMapper = productMapper;
     }
 
+    @GetMapping("/{gameId}")
+    public ResponseEntity<ProductResponseDTO> getOne(
+            @PathVariable String gameId,
+            @RequestParam(value = "curr", required = false) String targetCurrency
+    ) {
+        var product = productService.findOneWithCurrency(gameId, targetCurrency);
+        return ResponseEntity.ok(product);
+    }
+
     // -------------------------------
     // GET /products?curr=BRL
     // -------------------------------
@@ -33,20 +42,18 @@ public class OpenProductController {
                 .toList();
         return ResponseEntity.ok(response);
     }
+   // -------------------------------
+   // POST /products/rating/{gameId}
+   // -------------------------------
+   @PostMapping("/rating/{gameId}")
+   public ResponseEntity<ProductResponseDTO> addRating(
+           @PathVariable String gameId,
+           @RequestBody RatingDTO body
+   ) {
+       var product = productService.addRating(gameId, body.rating());
+       return ResponseEntity.ok(productMapper.toResponseDTO(product));
+   }
 
-    // -------------------------------
-// POST /products/rating/{gameId}
-// -------------------------------
-    @PostMapping("/rating/{gameId}")
-    public ResponseEntity<ProductResponseDTO> addRating(
-            @PathVariable String gameId,
-            @RequestBody RatingDTO body) {
-
-        var updated = productService.addRating(gameId, body.rating());
-        return ResponseEntity.ok(productMapper.toResponseDTO(updated));
-    }
-
-
-    // Corpo esperado: { "rating": double }
     public record RatingDTO(Double rating) {}
+
 }

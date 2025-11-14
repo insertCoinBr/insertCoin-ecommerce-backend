@@ -1,27 +1,32 @@
 package org.insertcoin.productservice.mappers;
 
-import org.insertcoin.productservice.dtos.ProductRequestDTO;
+import org.insertcoin.productservice.dtos.AddProductRequestDTO;
 import org.insertcoin.productservice.dtos.ProductResponseDTO;
 import org.insertcoin.productservice.entities.CategoryEntity;
 import org.insertcoin.productservice.entities.PlatformEntity;
 import org.insertcoin.productservice.entities.ProductEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     // Request DTO -> Entity
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "stock", ignore = true)
+    @Mapping(target = "rating", ignore = true)
+    @Mapping(target = "platform", ignore = true)
+    @Mapping(target = "imageUrl", expression = "java(dto.img())")
     @Mapping(target = "categories", expression = "java(toCategoryEntities(dto.category()))")
-    ProductEntity toEntity(ProductRequestDTO dto);
+    @Mapping(target = "gameId", ignore = true)
+    ProductEntity toEntity(AddProductRequestDTO dto);
 
     // Entity -> Response DTO
     @Mapping(source = "id", target = "uuid")
+    @Mapping(source = "gameId", target = "gameId")
     @Mapping(target = "category", expression = "java(toCategoryNames(entity.getCategories()))")
     @Mapping(target = "imageUrl", source = "imageUrl")
     @Mapping(target = "platform", expression = "java(toPlatformName(entity.getPlatform()))")
@@ -47,7 +52,6 @@ public interface ProductMapper {
                 .collect(Collectors.toList());
     }
 
-    // Conversão da PlatformEntity para String
     default String toPlatformName(PlatformEntity platform) {
         return platform != null ? platform.getName() : null;
     }

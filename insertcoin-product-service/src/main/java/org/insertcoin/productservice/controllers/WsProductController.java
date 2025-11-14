@@ -1,11 +1,9 @@
 package org.insertcoin.productservice.controllers;
 
-import lombok.RequiredArgsConstructor;
 import org.insertcoin.productservice.dtos.AddProductRequestDTO;
 import org.insertcoin.productservice.dtos.EditProductRequestDTO;
 import org.insertcoin.productservice.dtos.RemoveProductRequestDTO;
 import org.insertcoin.productservice.services.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

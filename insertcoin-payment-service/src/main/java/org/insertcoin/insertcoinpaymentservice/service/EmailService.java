@@ -2,6 +2,7 @@ package org.insertcoin.insertcoinpaymentservice.service;
 
 import org.insertcoin.insertcoinpaymentservice.dtos.EmailAttachmentDTO;
 import org.insertcoin.insertcoinpaymentservice.dtos.EmailMessageDTO;
+import org.insertcoin.insertcoinpaymentservice.dtos.ProductDTO;
 import org.insertcoin.insertcoinpaymentservice.publisher.EmailPublisher;
 import org.springframework.stereotype.Service;
 
@@ -34,13 +35,18 @@ public class EmailService {
         publisher.publish(dto);
     }
 
-    public void buildCardEmail(String orderId, String customerEmail, Double amount) {
+    public void buildCardEmail(String orderId, String customerEmail, Double amount, List<ProductDTO> products, String currency) {
         EmailMessageDTO dto = new EmailMessageDTO();
         dto.setType("CARD_PAYMENT");
         dto.setTo(customerEmail);
         dto.setSubject("Pagamento aprovado - Pedido " + orderId);
         dto.setTemplate("card-payment-approved");
-        dto.setVariables(Map.of("orderId", orderId, "amount", amount));
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderId", orderId);
+        variables.put("amount", amount);
+        variables.put("products", products);
+        variables.put("currency", currency);
+        dto.setVariables(variables);
         dto.setAttachments(Collections.emptyList());
         publisher.publish(dto);
     }

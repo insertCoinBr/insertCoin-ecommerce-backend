@@ -10,6 +10,7 @@ public class EmailMessageDTO {
     private String template;
     private Map<String, Object> variables;
     private List<EmailAttachmentDTO> attachments;
+    private String currency;
 
     public String getType() {
         return type;
@@ -57,5 +58,13 @@ public class EmailMessageDTO {
 
     public void setAttachments(List<EmailAttachmentDTO> attachments) {
         this.attachments = attachments;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

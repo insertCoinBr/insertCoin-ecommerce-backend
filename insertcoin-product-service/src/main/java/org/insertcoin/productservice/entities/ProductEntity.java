@@ -10,7 +10,7 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "id")
+    @Column(name = "id_product")
     private UUID id;
     @Column(name = "game_id", unique = true, nullable = false)
     private String gameId;

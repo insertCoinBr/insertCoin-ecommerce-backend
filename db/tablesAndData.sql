@@ -154,7 +154,7 @@ CREATE TABLE platform (
 );
 
 CREATE TABLE product (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    id_product uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     name varchar(150) NOT NULL,
     description text,
     price numeric(10,2) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE product_rating (
     created_at TIMESTAMP DEFAULT NOW(),
 
     CONSTRAINT fk_product_rating_product
-        FOREIGN KEY (id_product) REFERENCES product(id)
+        FOREIGN KEY (id_product) REFERENCES product(id_product)
 );
 
 
@@ -191,7 +191,7 @@ ALTER TABLE product_categories
     ADD FOREIGN KEY (id_category) REFERENCES category(id) ON DELETE CASCADE;
 
 ALTER TABLE product_categories
-    ADD FOREIGN KEY (id_product) REFERENCES product(id) ON DELETE CASCADE;
+    ADD FOREIGN KEY (id_product) REFERENCES product(id_product) ON DELETE CASCADE;
 
 ALTER TABLE product
     ADD FOREIGN KEY (id_category) REFERENCES category(id);
@@ -223,7 +223,7 @@ INSERT INTO platform (id, name) VALUES
 (4, 'Nintendo Switch');
 
 INSERT INTO product (
-    id, name, description, price, rating, game_id,
+    id_product, name, description, price, rating, game_id,
     id_category, id_platform, image_url, stock
 ) VALUES
 ('4255c5b3-6179-43e3-ab66-185aef8ee119',

@@ -1,5 +1,6 @@
 package org.insertcoin.insertcoinorderservice.services;
 
+import jakarta.transaction.Transactional;
 import org.insertcoin.insertcoinorderservice.clients.AuthClient;
 import org.insertcoin.insertcoinorderservice.clients.ProductClient;
 import org.insertcoin.insertcoinorderservice.dtos.request.OrderCreateRequestDTO;
@@ -11,6 +12,7 @@ import org.insertcoin.insertcoinorderservice.entities.OrderItemEntity;
 import org.insertcoin.insertcoinorderservice.enums.OrderStatus;
 import org.insertcoin.insertcoinorderservice.repositories.OrderRepository;
 import org.insertcoin.insertcoinorderservice.repositories.OrderItemRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,27 +25,28 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final AuthClient authClient;
     private final ProductClient productClient;
+    private final EmailService emailService;
 
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
                         AuthClient authClient,
-                        ProductClient productClient) {
+                        ProductClient productClient, RabbitTemplate rabbitTemplate, EmailService emailService) {
 
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.authClient = authClient;
         this.productClient = productClient;
+        this.emailService = emailService;
     }
 
+    @Transactional
     public OrderEntity createOrder(String token, OrderCreateRequestDTO request) {
 
-        // 1. Buscar usuário autenticado
         AuthMeResponseDTO user = authClient.getAuthenticatedUser(token);
         if (user == null) {
             throw new RuntimeException("Usuário não autenticado.");
         }
 
-        // 2. Criar entidade do pedido
         OrderEntity order = new OrderEntity();
         order.setCustomerId(user.getId());
         order.setCustomerName(user.getName());
@@ -53,7 +56,6 @@ public class OrderService {
 
         BigDecimal total = BigDecimal.ZERO;
 
-        // 3. Processar cada item do pedido
         for (OrderItemRequestDTO itemDTO : request.getItems()) {
 
             ProductResponseDTO product =
@@ -81,11 +83,13 @@ public class OrderService {
             total = total.add(subtotal);
         }
 
-        // 4. Definir total
         order.setTotalAmount(total);
 
-        // 5. Salvar pedido
-        return orderRepository.save(order);
+        OrderEntity savedOrder = orderRepository.save(order);
+
+        emailService.sendToQueuePaymentService(savedOrder, request);
+
+        return savedOrder;
     }
 
     private String generateOrderNumber() {

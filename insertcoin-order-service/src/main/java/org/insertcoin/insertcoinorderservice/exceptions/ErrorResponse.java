@@ -1,4 +1,4 @@
-package org.insertcoin.insertcoin_auth_service.exceptions;
+package org.insertcoin.insertcoinorderservice.exceptions;
 
 import java.time.LocalDateTime;
 

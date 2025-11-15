@@ -105,9 +105,9 @@ public class ProductService {
     // ====================================================
     // GET ONE PRODUCT
     // ====================================================
-    public ProductResponseDTO findOneWithCurrency(String gameId, String targetCurrency) {
+    public ProductResponseDTO findOneWithCurrency(UUID id, String targetCurrency) {
 
-        var product = repository.findByGameId(gameId)
+        var product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         var categories = product.getCategories();

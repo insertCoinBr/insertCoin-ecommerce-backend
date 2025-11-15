@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
@@ -20,12 +21,12 @@ public class OpenProductController {
         this.productMapper = productMapper;
     }
 
-    @GetMapping("/{gameId}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getOne(
-            @PathVariable String gameId,
+            @PathVariable UUID id,
             @RequestParam(value = "curr", required = false) String targetCurrency
     ) {
-        var product = productService.findOneWithCurrency(gameId, targetCurrency);
+        var product = productService.findOneWithCurrency(id, targetCurrency);
         return ResponseEntity.ok(product);
     }
 

@@ -10,6 +10,7 @@ import org.insertcoin.insertcoinorderservice.dtos.response.ProductResponseDTO;
 import org.insertcoin.insertcoinorderservice.entities.OrderEntity;
 import org.insertcoin.insertcoinorderservice.entities.OrderItemEntity;
 import org.insertcoin.insertcoinorderservice.enums.OrderStatus;
+import org.insertcoin.insertcoinorderservice.repositories.CurrencyRepository;
 import org.insertcoin.insertcoinorderservice.repositories.OrderRepository;
 import org.insertcoin.insertcoinorderservice.repositories.OrderItemRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -25,18 +26,18 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final AuthClient authClient;
     private final ProductClient productClient;
-    private final EmailService emailService;
+    private final CurrencyRepository currencyRepository;
 
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
                         AuthClient authClient,
-                        ProductClient productClient, RabbitTemplate rabbitTemplate, EmailService emailService) {
+                        ProductClient productClient, RabbitTemplate rabbitTemplate, EmailService emailService, CurrencyRepository currencyRepository) {
 
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.authClient = authClient;
         this.productClient = productClient;
-        this.emailService = emailService;
+        this.currencyRepository = currencyRepository;
     }
 
     @Transactional
@@ -85,14 +86,18 @@ public class OrderService {
 
         order.setTotalAmount(total);
 
-        OrderEntity savedOrder = orderRepository.save(order);
-
-        emailService.sendToQueuePaymentService(savedOrder, request);
-
-        return savedOrder;
+        return orderRepository.save(order);
     }
 
     private String generateOrderNumber() {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    public BigDecimal getConversionRate(String from, String to) {
+        var currency = currencyRepository.findBySourceCurrencyAndTargetCurrency(from, to);
+        if (currency == null) {
+            throw new RuntimeException("Conversão de moeda não encontrada: " + from + " -> " + to);
+        }
+        return currency.getConversionRate();
     }
 }

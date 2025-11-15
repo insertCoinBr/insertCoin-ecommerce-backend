@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -75,4 +76,85 @@ public class OrderController {
 
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDTO> getOrderById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID orderId,
+            @RequestParam(defaultValue = "BRL") String currency
+    ) {
+        String token = authHeader.replace("Bearer ", "");
+
+        OrderEntity orderEntity = orderService.getOrderById(token, orderId);
+        if (orderEntity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        BigDecimal conversionRate = BigDecimal.ONE;
+        if (!"BRL".equalsIgnoreCase(currency)) {
+            conversionRate = orderService.getConversionRate("BRL", currency);
+        }
+        BigDecimal conversionRateFinal = conversionRate;
+
+        List<OrderItemResponseDTO> items = orderEntity.getItems().stream()
+                .map(item -> new OrderItemResponseDTO(
+                        item.getProductId(),
+                        item.getProductName(),
+                        item.getSku(),
+                        item.getQuantity(),
+                        item.getUnitPrice().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
+                        item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                ))
+                .collect(Collectors.toList());
+
+        OrderResponseDTO responseDTO = new OrderResponseDTO(
+                orderEntity.getId(),
+                orderEntity.getOrderNumber(),
+                orderEntity.getTotalAmount().multiply(conversionRate).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
+                orderEntity.getStatus(),
+                orderEntity.getCreatedAt(),
+                items
+        );
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/user")
+    public ResponseEntity<List<OrderResponseDTO>> getUserOrders(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "currency", required = false, defaultValue = "BRL") String currency,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
+            @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction
+    ) {
+        String token = authHeader.replace("Bearer ", "");
+
+        List<OrderEntity> orders = orderService.getOrdersByUser(token, currency, status, orderBy, direction);
+
+        List<OrderResponseDTO> response = orders.stream().map(order -> {
+            List<OrderItemResponseDTO> items = order.getItems().stream()
+                    .map(item -> new OrderItemResponseDTO(
+                            item.getProductId(),
+                            item.getProductName(),
+                            item.getSku(),
+                            item.getQuantity(),
+                            item.getUnitPrice(),
+                            item.getSubtotal()
+                    )).collect(Collectors.toList());
+
+            return new OrderResponseDTO(
+                    order.getId(),
+                    order.getOrderNumber(),
+                    order.getTotalAmount(),
+                    order.getStatus(),
+                    order.getCreatedAt(),
+                    items
+            );
+        }).collect(Collectors.toList());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

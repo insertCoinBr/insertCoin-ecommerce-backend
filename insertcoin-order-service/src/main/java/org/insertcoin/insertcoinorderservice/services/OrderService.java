@@ -17,7 +17,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -99,5 +103,63 @@ public class OrderService {
             throw new RuntimeException("Conversão de moeda não encontrada: " + from + " -> " + to);
         }
         return currency.getConversionRate();
+    }
+
+    public OrderEntity getOrderById(String token, UUID orderId) {
+        AuthMeResponseDTO user = authClient.getAuthenticatedUser(token);
+        if (user == null) {
+            throw new RuntimeException("Usuário não autenticado.");
+        }
+        return orderRepository.findByIdAndCustomerId(orderId, user.getId())
+                .orElse(null);
+    }
+
+    public List<OrderEntity> getOrdersByUser(
+            String token,
+            String targetCurrency,
+            String statusFilter,
+            String orderBy,
+            String direction
+    ) {
+        AuthMeResponseDTO user = authClient.getAuthenticatedUser(token);
+        if (user == null) {
+            throw new RuntimeException("Usuário não autenticado.");
+        }
+
+        // Buscar todos os pedidos do usuário
+        List<OrderEntity> orders = orderRepository.findByCustomerId(user.getId());
+
+        // Filtrar por status
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            orders = orders.stream()
+                    .filter(order -> order.getStatus().name().equalsIgnoreCase(statusFilter))
+                    .collect(Collectors.toList());
+        }
+
+        // Ordenar
+        if (orderBy != null && !orderBy.isEmpty()) {
+            Comparator<OrderEntity> comparator = switch (orderBy.toLowerCase()) {
+                case "totalamount" -> Comparator.comparing(OrderEntity::getTotalAmount);
+                default -> Comparator.comparing(OrderEntity::getCreatedAt);
+            };
+            if ("desc".equalsIgnoreCase(direction)) {
+                comparator = comparator.reversed();
+            }
+            orders.sort(comparator);
+        }
+
+        // Conversão de moeda
+        if (targetCurrency != null && !"BRL".equalsIgnoreCase(targetCurrency)) {
+            BigDecimal conversionRate = getConversionRate("BRL", targetCurrency);
+            orders.forEach(order -> {
+                order.getItems().forEach(item -> {
+                    item.setUnitPrice(item.getUnitPrice().multiply(conversionRate).setScale(2, RoundingMode.HALF_UP));
+                    item.setSubtotal(item.getSubtotal().multiply(conversionRate).setScale(2, RoundingMode.HALF_UP));
+                });
+                order.setTotalAmount(order.getTotalAmount().multiply(conversionRate).setScale(2, RoundingMode.HALF_UP));
+            });
+        }
+
+        return orders;
     }
 }

@@ -3,9 +3,9 @@ package org.insertcoin.insertcoin_auth_service.exceptions;
 import java.time.LocalDateTime;
 
 public class ErrorResponse {
-    private String error;
-    private String message;
-    private LocalDateTime timestamp;
+    private final String error;
+    private final String message;
+    private final LocalDateTime timestamp;
 
     public ErrorResponse(String error, String message) {
         this.error = error;

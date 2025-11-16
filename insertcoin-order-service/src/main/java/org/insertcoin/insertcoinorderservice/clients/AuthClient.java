@@ -1,26 +1,18 @@
 package org.insertcoin.insertcoinorderservice.clients;
 
 import org.insertcoin.insertcoinorderservice.dtos.response.AuthMeResponseDTO;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
-@Component
-public class AuthClient {
+@FeignClient(
+        name = "insertcoin-auth-service",
+        path = "/auth"
+)
+public interface AuthClient {
 
-    private final WebClient webClient;
-
-    public AuthClient(@Qualifier("gatewayWebClient") WebClient webClient) {
-        this.webClient = webClient;
-    }
-
-    public AuthMeResponseDTO getAuthenticatedUser(String token) {
-        return webClient
-                .get()
-                .uri("/auth/me")
-                .headers(headers -> headers.setBearerAuth(token))
-                .retrieve()
-                .bodyToMono(AuthMeResponseDTO.class)
-                .block();
-    }
+    @GetMapping("/me")
+    AuthMeResponseDTO getAuthenticatedUser(
+            @RequestHeader("Authorization") String token
+    );
 }

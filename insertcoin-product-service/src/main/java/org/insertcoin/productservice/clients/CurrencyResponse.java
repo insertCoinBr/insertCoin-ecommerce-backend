@@ -1,16 +1,17 @@
 package org.insertcoin.productservice.clients;
 
 public class CurrencyResponse {
-    private double conversionRate;
+    private double originalValue;
     private double convertedValue;
-    private String enviroment;
+    private String source;
+    private String target;
 
-    public double getConversionRate() {
-        return conversionRate;
+    public double getOriginalValue() {
+        return originalValue;
     }
 
-    public void setConversionRate(double conversionRate) {
-        this.conversionRate = conversionRate;
+    public void setOriginalValue(double originalValue) {
+        this.originalValue = originalValue;
     }
 
     public double getConvertedValue() {
@@ -21,11 +22,19 @@ public class CurrencyResponse {
         this.convertedValue = convertedValue;
     }
 
-    public String getEnviroment() {
-        return enviroment;
+    public String getSource() {
+        return source;
     }
 
-    public void setEnviroment(String enviroment) {
-        this.enviroment = enviroment;
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 }

@@ -85,7 +85,7 @@ public class CurrencyController {
     }
 
     // -------------------
-    // Métodos auxiliares
+    // Metodos auxiliares
     // -------------------
     private double getRateFromBC(String currencyCode) throws Exception {
         if (currencyCode.equals("BRL")) {
@@ -97,7 +97,7 @@ public class CurrencyController {
             throw new Exception("No exchange data found for " + currencyCode);
         }
 
-        // Usa a última cotação retornada
+        // Usa a ultima cotacao retornada
         return response.getValue()
                 .getLast()
                 .getCotacaoVenda();

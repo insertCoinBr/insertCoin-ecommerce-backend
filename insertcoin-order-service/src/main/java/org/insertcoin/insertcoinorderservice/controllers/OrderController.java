@@ -35,11 +35,8 @@ public class OrderController {
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody OrderCreateRequestDTO request
     ) {
-        // Extrair token Bearer
-        String token = authHeader.replace("Bearer ", "");
 
-        // Criar pedido
-        OrderEntity orderEntity = orderService.createOrder(token, request);
+        OrderEntity orderEntity = orderService.createOrder(authHeader, request);
 
         BigDecimal conversionRate = BigDecimal.ONE;
         if ("USD".equalsIgnoreCase(request.getCurrency())) {

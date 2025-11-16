@@ -1,28 +1,22 @@
 package org.insertcoin.insertcoinorderservice.clients;
 
 import org.insertcoin.insertcoinorderservice.dtos.response.ProductResponseDTO;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.UUID;
 
-@Component
-public class ProductClient {
+@FeignClient(
+        name = "insertcoin-product-service",
+        path = "/products"
+)
+public interface ProductClient {
 
-    private final WebClient webClient;
-
-    public ProductClient(@Qualifier("gatewayWebClient") WebClient webClient) {
-        this.webClient = webClient;
-    }
-
-    public ProductResponseDTO findById(UUID id, String token) {
-        return webClient
-                .get()
-                .uri("/products/" + id)
-                .headers(headers -> headers.setBearerAuth(token))
-                .retrieve()
-                .bodyToMono(ProductResponseDTO.class)
-                .block();
-    }
+    @GetMapping("/{id}")
+    ProductResponseDTO findById(
+            @PathVariable UUID id,
+            @RequestHeader("Authorization") String token
+    );
 }

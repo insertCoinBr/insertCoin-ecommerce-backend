@@ -6,6 +6,7 @@ import org.insertcoin.productservice.dtos.AddProductRequestDTO;
 import org.insertcoin.productservice.dtos.EditProductRequestDTO;
 import org.insertcoin.productservice.dtos.ProductResponseDTO;
 import org.insertcoin.productservice.entities.CategoryEntity;
+import org.insertcoin.productservice.entities.PlatformEntity;
 import org.insertcoin.productservice.entities.ProductEntity;
 import org.insertcoin.productservice.entities.ProductRatingEntity;
 import org.insertcoin.productservice.repositories.CategoryRepository;
@@ -81,9 +82,9 @@ public class ProductService {
     // RATINGS
     // ====================================================
     @Transactional
-    public ProductEntity addRating(String gameId, double ratingValue) {
+    public ProductEntity addRating(UUID id, double ratingValue) {
 
-        var product = repository.findByGameId(gameId)
+        var product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         var rating = new ProductRatingEntity();
@@ -145,16 +146,17 @@ public class ProductService {
         var platform = platformRepository.findByName(dto.platform())
                 .orElseThrow(() -> new RuntimeException("Plataforma não encontrada"));
 
-        long nextSeq = repository.countByPlatform(platform) + 1;
-        String gameId = platform.getName().toUpperCase() + "_" + String.format("%03d", nextSeq);
+        // 🛑 REMOVEMOS A GERAÇÃO DE gameId SEQUENCIAL, POIS NÃO É MAIS O IDENTIFICADOR DE BUSCA.
+        // Se a coluna gameId ainda existir no banco, ela deve ser UUID e nullable.
 
         var p = new ProductEntity();
-        p.setGameId(gameId);
+        // 🛑 REMOÇÃO da linha: p.setGameId(gameId);
         p.setName(dto.name());
         p.setPrice(dto.price());
         p.setDescription(dto.description());
         p.setImageUrl(dto.img());
         p.setPlatform(platform);
+        p.setStock(dto.stock());
 
         var saved = repository.save(p);
 
@@ -172,8 +174,9 @@ public class ProductService {
     // ====================================================
     // DELETE PRODUCT
     // ====================================================
-    public void deleteProduct(UUID id, String gameId) {
-        var existing = repository.findByIdAndGameId(id, gameId)
+    public void deleteProduct(UUID id) {
+        // Busca apenas pelo ID
+        var existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         repository.delete(existing);
@@ -185,7 +188,8 @@ public class ProductService {
     @Transactional
     public ProductResponseDTO updateProduct(UUID id, EditProductRequestDTO dto) {
 
-        var product = repository.findByIdAndGameId(id, dto.gameId())
+        // 🛑 BUSCA APENAS PELO ID
+        var product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         product.setName(dto.name());
@@ -197,6 +201,9 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Plataforma inválida"));
 
         product.setPlatform(platform);
+
+        // 🛑 REMOVER A ATUALIZAÇÃO DO gameId. Se o campo foi mantido, ele não deve ser alterado aqui.
+        // product.setGameId(dto.gameId()); // Linha removida
 
         var updated = repository.save(product);
 
@@ -210,5 +217,13 @@ public class ProductService {
         var categories = categoryRepository.findByProductId(updated.getId());
 
         return ProductResponseDTO.from(updated, categories, platform, updated.getPrice());
+    }
+
+    public List<CategoryEntity> findAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+    public List<PlatformEntity> findAllPlatforms() {
+        return platformRepository.findAll();
     }
 }

@@ -8,5 +8,6 @@ public record AddProductRequestDTO(
         List<String> category,
         String platform,
         String description,
-        String img
+        String img,
+        int stock
 ) {}

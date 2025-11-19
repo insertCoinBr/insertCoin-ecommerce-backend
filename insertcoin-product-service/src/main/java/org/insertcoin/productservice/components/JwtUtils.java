@@ -1,42 +1,27 @@
-package org.insertcoin.insertcoin_auth_service.components;
+package org.insertcoin.productservice.components;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.crypto.SecretKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
-import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
+import org.springframework.stereotype.Component;
 
-public class JwtUtil {
+import javax.crypto.SecretKey;
 
+@Component
+public class JwtUtils {
+
+    // MANTENHA A MESMA CHAVE DO AUTH SERVICE
     private static final String SECRET_KEY = "chaveSuperSecretaParaJWTdeExemplo!@#123";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24h
 
-    private static SecretKey getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public static String generateToken(UserEntity user) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", user.getId().toString());
-        claims.put("email", user.getEmail());
+    // Método generateToken REMOVIDO pois este serviço não cria usuários
 
-        claims.put("roles", user.getRoles()
-                .stream().map(RoleEntity::getName).toList());
-
-        return Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public static Claims validateToken(String token) {
+    // Valida e retorna as informações (Claims) se o token estiver ok
+    public Claims validateToken(String token) {
         try {
             return Jwts.parser()
                     .verifyWith(getSigningKey())
@@ -44,14 +29,18 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
+            // Token inválido, expirado ou modificado
             return null;
         }
     }
 
-    public static String getJwtFromRequest(HttpServletRequest request) {
+    public String getJwtFromRequest(HttpServletRequest request) {
         String jwt = request.getHeader("Authorization");
-        if (jwt == null || jwt.isEmpty())
+
+        // Fallback para minúsculo caso algum proxy altere o header
+        if (jwt == null || jwt.isEmpty()) {
             jwt = request.getHeader("authorization");
+        }
 
         if (jwt != null && jwt.startsWith("Bearer ")) {
             return jwt.substring(7);

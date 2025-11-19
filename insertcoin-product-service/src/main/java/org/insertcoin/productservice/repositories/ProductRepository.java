@@ -15,24 +15,19 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
     Optional<ProductEntity> findById(UUID id_product);
-    Optional<ProductEntity> findByName(String name);
-    Optional<ProductEntity> findByGameId(String gameId);
-    Optional<ProductEntity> findByIdAndGameId(UUID id, String gameId);
-    long countByPlatform(PlatformEntity platform);
 
     @Modifying
     @Transactional
     @Query(
-            value = "INSERT INTO product_categories (product_id, category_id) VALUES (:productId, :categoryId)",
+            value = "INSERT INTO product_categories (id_product, id_category) VALUES (:productId, :categoryId)",
             nativeQuery = true
     )
     void insertCategory(UUID productId, int categoryId);
 
-
     @Modifying
     @Transactional
     @Query(
-            value = "DELETE FROM product_categories WHERE product_id = :productId",
+            value = "DELETE FROM product_categories WHERE id_product = :productId",
             nativeQuery = true
     )
     void deleteCategories(UUID productId);

@@ -81,9 +81,8 @@ public class OrderController {
             @PathVariable UUID orderId,
             @RequestParam(defaultValue = "BRL") String currency
     ) {
-        String token = authHeader.replace("Bearer ", "");
 
-        OrderEntity orderEntity = orderService.getOrderById(token, orderId);
+        OrderEntity orderEntity = orderService.getOrderById(authHeader, orderId);
         if (orderEntity == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -126,9 +125,8 @@ public class OrderController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
             @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction
     ) {
-        String token = authHeader.replace("Bearer ", "");
 
-        List<OrderEntity> orders = orderService.getOrdersByUser(token, currency, status, orderBy, direction);
+        List<OrderEntity> orders = orderService.getOrdersByUser(authHeader, currency, status, orderBy, direction);
 
         List<OrderResponseDTO> response = orders.stream().map(order -> {
             List<OrderItemResponseDTO> items = order.getItems().stream()

@@ -1,6 +1,7 @@
 package org.insertcoin.productservice.controllers;
 
 import org.insertcoin.productservice.dtos.ProductResponseDTO;
+import org.insertcoin.productservice.entities.CategoryEntity;
 import org.insertcoin.productservice.mappers.ProductMapper;
 import org.insertcoin.productservice.services.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,6 @@ public class OpenProductController {
         return ResponseEntity.ok(product);
     }
 
-    // -------------------------------
-    // GET /products?curr=BRL
-    // -------------------------------
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getProducts(
             @RequestParam(defaultValue = "BRL") String curr) {
@@ -43,18 +41,30 @@ public class OpenProductController {
                 .toList();
         return ResponseEntity.ok(response);
     }
-   // -------------------------------
-   // POST /products/rating/{gameId}
-   // -------------------------------
-   @PostMapping("/rating/{gameId}")
+
+   @PostMapping("/rating/{id}")
    public ResponseEntity<ProductResponseDTO> addRating(
-           @PathVariable String gameId,
+           @PathVariable UUID id,
            @RequestBody RatingDTO body
    ) {
-       var product = productService.addRating(gameId, body.rating());
+       var product = productService.addRating(id, body.rating());
        return ResponseEntity.ok(productMapper.toResponseDTO(product));
    }
 
     public record RatingDTO(Double rating) {}
 
+
+    @GetMapping("/categories")
+    public List<String> getCategoryNames() {
+        return productService.findAllCategories()
+                .stream()
+                .map(CategoryEntity::getName)
+                .toList();
+    }
+
+
+    @GetMapping("/platforms")
+    public ResponseEntity<?> getPlatforms() {
+        return ResponseEntity.ok(productService.findAllPlatforms());
+    }
 }

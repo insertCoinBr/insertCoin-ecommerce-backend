@@ -162,4 +162,11 @@ public class OrderService {
 
         return orders;
     }
+
+    public void deleteOrder(UUID orderId) {
+        OrderEntity existing = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        orderRepository.delete(existing);
+    }
 }

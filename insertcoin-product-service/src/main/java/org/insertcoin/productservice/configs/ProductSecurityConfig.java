@@ -1,5 +1,6 @@
 package org.insertcoin.productservice.configs;
 
+import org.insertcoin.productservice.components.AuthTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -39,7 +40,8 @@ public class ProductSecurityConfig {
                         // Swagger / OpenAPI (Documentação)
                         .requestMatchers(
                                 "/products",
-                                "/products",
+                                "/ws/products/addProduct",
+                                "/ws/products/removeProduct",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
@@ -52,11 +54,13 @@ public class ProductSecurityConfig {
                         // 2. ROTAS PROTEGIDAS (Precisa de Token JWT)
                         // ------------------------------------------------------------
                         // Avaliar produto (POST /products/rating/{id})
-                        .requestMatchers(HttpMethod.POST, "/products/rating/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/products/rating/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/ws/products/**").permitAll()
 
                         // Rotas Administrativas (ws/...)
                         // Nota: Se você tiver roles, troque .authenticated() por .hasRole("ADMIN")
-                        .requestMatchers("/ws/**").authenticated()
+                        .requestMatchers("/ws/**").permitAll()
 
                         // ------------------------------------------------------------
                         // 3. BLOQUEIO GERAL

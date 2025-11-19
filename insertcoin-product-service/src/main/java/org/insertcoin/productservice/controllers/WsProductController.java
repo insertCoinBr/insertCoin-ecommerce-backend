@@ -2,7 +2,6 @@ package org.insertcoin.productservice.controllers;
 
 import org.insertcoin.productservice.dtos.AddProductRequestDTO;
 import org.insertcoin.productservice.dtos.EditProductRequestDTO;
-import org.insertcoin.productservice.dtos.RemoveProductRequestDTO;
 import org.insertcoin.productservice.services.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,22 +18,22 @@ public class WsProductController {
         this.productService = productService;
     }
 
-    @PostMapping
+    @PostMapping("/addProduct")
     public ResponseEntity<?> addProduct(@RequestBody AddProductRequestDTO dto) {
         var result = productService.createProduct(dto);
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/removeProduct/{id}")
     public ResponseEntity<?> removeProduct(
-            @PathVariable UUID id,
-            @RequestBody RemoveProductRequestDTO dto
+            @PathVariable UUID id
+
     ) {
-        productService.deleteProduct(id, dto.gameId());
+        productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/updateProduct/{id}")
     public ResponseEntity<?> editProduct(
             @PathVariable UUID id,
             @RequestBody EditProductRequestDTO dto

@@ -309,6 +309,7 @@ CREATE TABLE order_item (
     quantity INTEGER NOT NULL DEFAULT 1,
     unit_price DECIMAL(10,2) NOT NULL,
     subtotal DECIMAL(12,2) NOT NULL,
+	image_url text,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

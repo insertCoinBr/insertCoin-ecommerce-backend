@@ -116,6 +116,7 @@ public class UserService implements UserDetailsService {
                 user.getName(),
                 user.getEmail(),
                 user.getActive(),
+                user.getPoint(),
                 user.getRoles()
                         .stream()
                         .map(RoleEntity::getName)

@@ -1,23 +1,33 @@
 package org.insertcoin.insertcoinorderservice.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.insertcoin.insertcoinorderservice.utils.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public JwtAuthFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -25,27 +35,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = JwtUtil.getJwtFromRequest(request);
+        String token = jwtUtil.getJwtFromRequest(request);
+
+        Claims claims = null;
         if (token != null) {
-            var claims = JwtUtil.validateToken(token);
-            if (claims != null) {
-                String email = claims.get("email", String.class);
+            claims = jwtUtil.validateToken(token);
+        }
 
-                // Extrair roles da claim
-                List<String> roles = claims.get("roles", List.class);
-                var authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList());
+        if (claims != null) {
+            //System.out.println("\n==== JWT RECEBIDO NO ORDER SERVICE ====");
+            //claims.forEach((k, v) -> System.out.println(k + " : " + v));
+            //System.out.println("=======================================\n");
 
-                // Criar Authentication
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(email, null, authorities);
+            String email = claims.get("email", String.class);
 
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            List<String> roles = objectMapper.convertValue(claims.get("roles"), new TypeReference<List<String>>() {});
+            List<String> permissions = objectMapper.convertValue(claims.get("permissions"), new TypeReference<List<String>>() {});
 
-                System.out.println("Autenticado: " + email + " Roles: " + authorities);
+            Set<GrantedAuthority> authorities = new HashSet<>();
+
+            if (permissions != null) {
+                permissions.forEach(p ->
+                        authorities.add(new SimpleGrantedAuthority(p)));
             }
+
+            if (roles != null) {
+                roles.forEach(r ->
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + r)));
+            }
+
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            authorities
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);

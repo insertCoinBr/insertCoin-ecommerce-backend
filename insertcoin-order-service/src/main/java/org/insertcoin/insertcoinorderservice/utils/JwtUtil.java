@@ -4,20 +4,19 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-
+import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.util.Base64;
 
+@Component
 public class JwtUtil {
 
     private static final String SECRET_KEY = "chaveSuperSecretaParaJWTdeExemplo!@#123";
 
-    private static SecretKey getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public static Claims validateToken(String token) {
+    public Claims validateToken(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
@@ -29,7 +28,7 @@ public class JwtUtil {
         }
     }
 
-    public static String getJwtFromRequest(HttpServletRequest request) {
+    public String getJwtFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (bearer != null && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);

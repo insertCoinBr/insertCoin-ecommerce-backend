@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/ws/orders")
-public class WsOrderController {
+@RequestMapping("/orders/admin")
+public class OrderAdminController {
 
     private final OrderService orderService;
 
-    public WsOrderController(OrderService orderService) {
+    public OrderAdminController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @PreAuthorize("hasRole('MANAGER_STORE')")
+    @PreAuthorize("hasAuthority('ORDERS_ADMIN')")
     @DeleteMapping("/deleteOrder/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable UUID orderId) {
         orderService.deleteOrder(orderId);

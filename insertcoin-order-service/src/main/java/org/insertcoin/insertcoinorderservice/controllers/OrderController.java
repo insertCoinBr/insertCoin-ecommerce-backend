@@ -58,7 +58,8 @@ public class OrderController {
                         item.getSku(),
                         item.getQuantity(),
                         item.getUnitPrice().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
-                        item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                        item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
+                        item.getImageUrl()
                 ))
                 .collect(Collectors.toList());
 
@@ -100,7 +101,8 @@ public class OrderController {
                         item.getSku(),
                         item.getQuantity(),
                         item.getUnitPrice().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
-                        item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                        item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
+                        item.getImageUrl()
                 ))
                 .collect(Collectors.toList());
 
@@ -136,7 +138,8 @@ public class OrderController {
                             item.getSku(),
                             item.getQuantity(),
                             item.getUnitPrice(),
-                            item.getSubtotal()
+                            item.getSubtotal(),
+                            item.getImageUrl()
                     )).collect(Collectors.toList());
 
             return new OrderResponseDTO(

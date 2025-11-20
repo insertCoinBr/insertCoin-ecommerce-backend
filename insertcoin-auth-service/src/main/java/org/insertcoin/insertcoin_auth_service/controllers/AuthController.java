@@ -48,6 +48,7 @@ public class AuthController {
                 user.getName(),
                 user.getEmail(),
                 user.getActive(),
+                user.getPoint(),
                 user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet())
         );
 

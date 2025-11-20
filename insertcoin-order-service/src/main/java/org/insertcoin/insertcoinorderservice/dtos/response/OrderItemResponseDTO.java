@@ -11,15 +11,17 @@ public class OrderItemResponseDTO {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
+    private String urlImage;
 
     public OrderItemResponseDTO(UUID productId, String productName, String sku,
-                                Integer quantity, BigDecimal unitPrice, BigDecimal subtotal) {
+                                Integer quantity, BigDecimal unitPrice, BigDecimal subtotal, String urlImage) {
         this.productId = productId;
         this.productName = productName;
         this.sku = sku;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.subtotal = subtotal;
+        this.urlImage = urlImage;
     }
 
     public UUID getProductId() {
@@ -68,5 +70,13 @@ public class OrderItemResponseDTO {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public String getUrlImage() {
+        return urlImage;
+    }
+
+    public void setUrlImage(String urlImage) {
+        this.urlImage = urlImage;
     }
 }

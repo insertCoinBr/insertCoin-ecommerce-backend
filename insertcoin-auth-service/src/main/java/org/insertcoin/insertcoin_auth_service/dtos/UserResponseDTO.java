@@ -8,5 +8,6 @@ public record UserResponseDTO(
         String name,
         String email,
         boolean active,
+        Integer point,
         Set<String> roles
 ) {}

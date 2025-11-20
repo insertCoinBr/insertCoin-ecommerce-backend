@@ -14,8 +14,10 @@ import org.insertcoin.insertcoinorderservice.repositories.CurrencyRepository;
 import org.insertcoin.insertcoinorderservice.repositories.OrderRepository;
 import org.insertcoin.insertcoinorderservice.repositories.OrderItemRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
@@ -81,6 +83,7 @@ public class OrderService {
             item.setQuantity(itemDTO.getQuantity());
             item.setUnitPrice(unitPrice);
             item.setSubtotal(subtotal);
+            item.setImageUrl(product.getImageUrl());
 
             // Adicionar item ao pedido
             order.addItem(item);
@@ -169,4 +172,15 @@ public class OrderService {
 
         orderRepository.delete(existing);
     }
+
+    public Page<OrderEntity> searchOrders(OrderStatus status, String orderNumber, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.searchOrders(status, orderNumber, pageable);
+    }
+
+    public OrderEntity findByIdOrThrow(UUID id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + id));
+    }
+
 }

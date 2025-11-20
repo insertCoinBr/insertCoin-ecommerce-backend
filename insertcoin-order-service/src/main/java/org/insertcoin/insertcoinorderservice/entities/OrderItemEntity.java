@@ -34,6 +34,9 @@ public class OrderItemEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     public OrderItemEntity() {}
 
     // Getters e setters
@@ -92,5 +95,21 @@ public class OrderItemEntity {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 }

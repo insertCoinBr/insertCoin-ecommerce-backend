@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.insertcoin.insertcoin_auth_service.entities.PermissionEntity;
 import org.insertcoin.insertcoin_auth_service.entities.RoleEntity;
 import org.insertcoin.insertcoin_auth_service.entities.UserEntity;
 
@@ -25,8 +26,19 @@ public class JwtUtil {
         claims.put("id", user.getId().toString());
         claims.put("email", user.getEmail());
 
-        claims.put("roles", user.getRoles()
-                .stream().map(RoleEntity::getName).toList());
+        var roles = user.getRoles()
+                .stream()
+                .map(RoleEntity::getName)
+                .toList();
+        claims.put("roles", roles);
+
+        var permissions = user.getRoles()
+                .stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(PermissionEntity::getName)
+                .distinct()
+                .toList();
+        claims.put("permissions", permissions);
 
         return Jwts.builder()
                 .claims(claims)

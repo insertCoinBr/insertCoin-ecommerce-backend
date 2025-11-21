@@ -31,7 +31,7 @@ public class PaymentEntity {
     private String transactionId;
 
     @Column(name = "pix_payload", columnDefinition = "TEXT")
-    private String qrCode;
+    private String pixPayload;
 
     @Column(name = "pix_key", columnDefinition = "TEXT")
     private String pixKey;
@@ -48,7 +48,7 @@ public class PaymentEntity {
             BigDecimal amount,
             String status,
             String transactionId,
-            String qrCode,
+            String pixPayload,
             String pixKey,
             LocalDateTime paidAt,
             LocalDateTime createdAt
@@ -58,7 +58,7 @@ public class PaymentEntity {
         this.amount = amount;
         this.status = status;
         this.transactionId = transactionId;
-        this.qrCode = qrCode;
+        this.pixPayload = pixPayload;
         this.pixKey = pixKey;
         this.paidAt = paidAt;
         this.createdAt = createdAt;
@@ -144,12 +144,12 @@ public class PaymentEntity {
         this.transactionId = transactionId;
     }
 
-    public String getQrCode() {
-        return qrCode;
+    public String getPixPayload() {
+        return pixPayload;
     }
 
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
+    public void setPixPayload(String pixPayload) {
+        this.pixPayload = pixPayload;
     }
 
     public String getPixKey() {

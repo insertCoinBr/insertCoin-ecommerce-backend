@@ -12,8 +12,6 @@ public class ProductEntity {
     @GeneratedValue
     @Column(name = "id_product")
     private UUID id;
-    @Column(name = "game_id", unique = true)
-    private String gameId;
     private String name;
     private double price;
     private String description;
@@ -35,8 +33,6 @@ public class ProductEntity {
     )
     private List<CategoryEntity> categories;
 
-    // Getters e Setters
-
     public UUID getId() {
         return id;
     }
@@ -45,13 +41,6 @@ public class ProductEntity {
         this.id = id;
     }
 
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-    }
 
     public String getName() {
         return name;

@@ -159,7 +159,6 @@ CREATE TABLE product (
     description text,
     price numeric(10,2) NOT NULL,
     rating integer DEFAULT 0,
-    game_id varchar(50) NOT NULL,
     id_category integer,
     id_platform integer,
     image_url text,
@@ -223,7 +222,7 @@ INSERT INTO platform (id, name) VALUES
 (4, 'Nintendo Switch');
 
 INSERT INTO product (
-    id_product, name, description, price, rating, game_id,
+    id_product, name, description, price, rating,
     id_category, id_platform, image_url, stock
 ) VALUES
 ('4255c5b3-6179-43e3-ab66-185aef8ee119',
@@ -231,7 +230,6 @@ INSERT INTO product (
  'Shooter futurista exclusivo da Microsoft',
  279.90,
  4,
- 'HALO_INF_001',
  1,
  2,
  'https://example.com/halo.jpg',
@@ -242,7 +240,6 @@ INSERT INTO product (
  'RPG de mundo aberto desenvolvido pela FromSoftware',
  299.90,
  5,
- 'ELDEN_RING_001',
  3,
  3,
  'https://example.com/eldenring.jpg',
@@ -253,7 +250,6 @@ INSERT INTO product (
  'Nova aventura da série Zelda com exploração livre',
  399.90,
  5,
- 'ZELDA_TOK_001',
  2,
  4,
  'https://example.com/zelda.jpg',
@@ -264,7 +260,6 @@ INSERT INTO product (
  'Jogo de futebol com modo carreira e multiplayer online',
  349.90,
  5,
- 'FIFA_24_001',
  4,
  1,
  'https://example.com/fifa24.jpg',

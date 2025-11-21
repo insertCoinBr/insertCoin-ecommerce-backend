@@ -55,7 +55,6 @@ public class OrderController {
                 .map(item -> new OrderItemResponseDTO(
                         item.getProductId(),
                         item.getProductName(),
-                        item.getSku(),
                         item.getQuantity(),
                         item.getUnitPrice().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
                         item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
@@ -98,7 +97,6 @@ public class OrderController {
                 .map(item -> new OrderItemResponseDTO(
                         item.getProductId(),
                         item.getProductName(),
-                        item.getSku(),
                         item.getQuantity(),
                         item.getUnitPrice().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
                         item.getSubtotal().multiply(conversionRateFinal).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros(),
@@ -135,7 +133,6 @@ public class OrderController {
                     .map(item -> new OrderItemResponseDTO(
                             item.getProductId(),
                             item.getProductName(),
-                            item.getSku(),
                             item.getQuantity(),
                             item.getUnitPrice(),
                             item.getSubtotal(),

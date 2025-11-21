@@ -87,7 +87,6 @@ public class OrderAdminController {
                 .map(item -> new OrderAdminItemResponseDTO(
                         item.getProductId(),
                         item.getProductName(),
-                        item.getSku(),
                         item.getQuantity(),
                         currencyConversionService.convertUSDToBRL(item.getUnitPrice(), currency),
                         currencyConversionService.convertUSDToBRL(item.getSubtotal(), currency),

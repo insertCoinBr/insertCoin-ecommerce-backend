@@ -20,8 +20,6 @@ public class OrderItemEntity {
     @Column(name = "product_name", nullable = false)
     private String productName;
 
-    private String sku;
-
     @Column(nullable = false)
     private Integer quantity;
 
@@ -59,14 +57,6 @@ public class OrderItemEntity {
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
     }
 
     public Integer getQuantity() {

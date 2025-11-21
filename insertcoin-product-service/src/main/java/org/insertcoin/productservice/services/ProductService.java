@@ -146,11 +146,7 @@ public class ProductService {
         var platform = platformRepository.findByName(dto.platform())
                 .orElseThrow(() -> new RuntimeException("Plataforma não encontrada"));
 
-        // 🛑 REMOVEMOS A GERAÇÃO DE gameId SEQUENCIAL, POIS NÃO É MAIS O IDENTIFICADOR DE BUSCA.
-        // Se a coluna gameId ainda existir no banco, ela deve ser UUID e nullable.
-
         var p = new ProductEntity();
-        // 🛑 REMOÇÃO da linha: p.setGameId(gameId);
         p.setName(dto.name());
         p.setPrice(dto.price());
         p.setDescription(dto.description());
@@ -201,9 +197,6 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Plataforma inválida"));
 
         product.setPlatform(platform);
-
-        // 🛑 REMOVER A ATUALIZAÇÃO DO gameId. Se o campo foi mantido, ele não deve ser alterado aqui.
-        // product.setGameId(dto.gameId()); // Linha removida
 
         var updated = repository.save(product);
 

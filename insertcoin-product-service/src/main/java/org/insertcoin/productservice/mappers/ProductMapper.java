@@ -21,12 +21,10 @@ public interface ProductMapper {
     @Mapping(target = "platform", ignore = true)
     @Mapping(target = "imageUrl", expression = "java(dto.img())")
     @Mapping(target = "categories", expression = "java(toCategoryEntities(dto.category()))")
-    @Mapping(target = "gameId", ignore = true)
     ProductEntity toEntity(AddProductRequestDTO dto);
 
     // Entity -> Response DTO
     @Mapping(source = "id", target = "uuid")
-    @Mapping(source = "gameId", target = "gameId")
     @Mapping(target = "category", expression = "java(toCategoryNames(entity.getCategories()))")
     @Mapping(target = "imageUrl", source = "imageUrl")
     @Mapping(target = "platform", expression = "java(toPlatformName(entity.getPlatform()))")

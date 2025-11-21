@@ -79,7 +79,6 @@ public class OrderService {
             OrderItemEntity item = new OrderItemEntity();
             item.setProductId(itemDTO.getProductId());
             item.setProductName(product.getName());
-            item.setSku(product.getGameId());
             item.setQuantity(itemDTO.getQuantity());
             item.setUnitPrice(unitPrice);
             item.setSubtotal(subtotal);

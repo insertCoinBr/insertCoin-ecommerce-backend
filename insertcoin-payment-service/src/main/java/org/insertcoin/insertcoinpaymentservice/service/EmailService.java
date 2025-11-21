@@ -3,6 +3,7 @@ package org.insertcoin.insertcoinpaymentservice.service;
 import org.insertcoin.insertcoinpaymentservice.dtos.EmailAttachmentDTO;
 import org.insertcoin.insertcoinpaymentservice.dtos.EmailMessageDTO;
 import org.insertcoin.insertcoinpaymentservice.dtos.ProductDTO;
+import org.insertcoin.insertcoinpaymentservice.dtos.PixPaymentCreatedDTO;
 import org.insertcoin.insertcoinpaymentservice.publisher.EmailPublisher;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +18,29 @@ public class EmailService {
         this.publisher = publisher;
     }
 
-    public void buildPixEmail(String orderId, String customerEmail, String qrCodeBase64, Double amount) {
+    public void buildPixEmail(PixPaymentCreatedDTO dto) {
+
         EmailAttachmentDTO qrCodeAttachment = new EmailAttachmentDTO(
                 "qrcode",
                 "image/png",
-                qrCodeBase64,
+                dto.getQrCode(),
                 true
         );
 
-        EmailMessageDTO dto = new EmailMessageDTO();
-        dto.setType("PIX_PAYMENT");
-        dto.setTo(customerEmail);
-        dto.setSubject("Pagamento PIX - Pedido " + orderId);
-        dto.setTemplate("pix-payment");
-        dto.setVariables(Map.of("orderId", orderId, "amount", amount));
-        dto.setAttachments(List.of(qrCodeAttachment));
-        publisher.publish(dto);
+        EmailMessageDTO email = new EmailMessageDTO();
+        email.setType("PIX_PAYMENT");
+        email.setTo(dto.getCustomerEmail());
+        email.setSubject("Pagamento PIX - Pedido " + dto.getOrderNumber());
+        email.setTemplate("pix-payment");
+
+        email.setVariables(Map.of(
+                "orderId", dto.getOrderNumber(),
+                "amount", dto.getAmount()
+        ));
+
+        email.setAttachments(List.of(qrCodeAttachment));
+
+        publisher.publish(email);
     }
 
     public void buildCardEmail(String orderId, String customerEmail, Double amount, List<ProductDTO> products, String currency) {
@@ -41,14 +49,15 @@ public class EmailService {
         dto.setTo(customerEmail);
         dto.setSubject("Pagamento aprovado - Pedido " + orderId);
         dto.setTemplate("card-payment-approved");
+
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", orderId);
         variables.put("amount", amount);
         variables.put("products", products);
         variables.put("currency", currency);
         dto.setVariables(variables);
+
         dto.setAttachments(Collections.emptyList());
         publisher.publish(dto);
     }
-
 }

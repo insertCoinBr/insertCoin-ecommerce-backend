@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public record ProductResponseDTO(
         UUID uuid,
-        String gameId,
         String name,
         Double price,
         List<String> category,
@@ -33,7 +32,6 @@ public record ProductResponseDTO(
 
         return new ProductResponseDTO(
                 p.getId(),                       // uuid
-                p.getGameId(),                   // gameId
                 p.getName(),                     // name
                 Double.valueOf(finalPrice),      // price (autobox)
                 catNames,                        // category

@@ -79,7 +79,6 @@ public class OrderService {
             OrderItemEntity item = new OrderItemEntity();
             item.setProductId(itemDTO.getProductId());
             item.setProductName(product.getName());
-            item.setSku(product.getGameId());
             item.setQuantity(itemDTO.getQuantity());
             item.setUnitPrice(unitPrice);
             item.setSubtotal(subtotal);
@@ -181,6 +180,21 @@ public class OrderService {
     public OrderEntity findByIdOrThrow(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + id));
+    }
+
+    public void updateOrderStatus(UUID orderId, String status) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        OrderStatus orderStatus;
+        try {
+            orderStatus = OrderStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
     }
 
 }

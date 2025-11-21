@@ -7,17 +7,15 @@ public class OrderItemResponseDTO {
 
     private UUID productId;
     private String productName;
-    private String sku;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
     private String urlImage;
 
-    public OrderItemResponseDTO(UUID productId, String productName, String sku,
+    public OrderItemResponseDTO(UUID productId, String productName,
                                 Integer quantity, BigDecimal unitPrice, BigDecimal subtotal, String urlImage) {
         this.productId = productId;
         this.productName = productName;
-        this.sku = sku;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.subtotal = subtotal;
@@ -38,14 +36,6 @@ public class OrderItemResponseDTO {
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
     }
 
     public Integer getQuantity() {

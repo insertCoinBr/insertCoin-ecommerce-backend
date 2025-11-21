@@ -183,4 +183,19 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found: " + id));
     }
 
+    public void updateOrderStatus(UUID orderId, String status) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        OrderStatus orderStatus;
+        try {
+            orderStatus = OrderStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+    }
+
 }

@@ -375,7 +375,7 @@ CREATE TABLE payment (
     id_order UUID NOT NULL,
     payment_method VARCHAR(50) NOT NULL,   -- 'PIX' ou 'CARD'
     amount DECIMAL(12,2) NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',  -- pending, approved, rejected
+    status VARCHAR(50) DEFAULT 'PENDING_PAYMENT',  -- pending, approved, rejected
     transaction_id VARCHAR(255),
     pix_key TEXT,
     pix_payload TEXT,

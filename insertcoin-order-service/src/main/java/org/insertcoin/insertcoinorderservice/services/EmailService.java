@@ -19,7 +19,8 @@ public class EmailService {
 
     public void sendToQueuePaymentService(OrderEntity savedOrder, OrderCreateRequestDTO request, BigDecimal totalAmount) {
         OrderCreatedEventDTO dto = new OrderCreatedEventDTO();
-        dto.setOrderId(savedOrder.getOrderNumber());
+        dto.setOrderId(savedOrder.getId());
+        dto.setOrderNumber(savedOrder.getOrderNumber());
         dto.setAmount(totalAmount);
         dto.setCustomerEmail(savedOrder.getCustomerEmail());
         dto.setPaymentMethod(request.getPaymentMethod());

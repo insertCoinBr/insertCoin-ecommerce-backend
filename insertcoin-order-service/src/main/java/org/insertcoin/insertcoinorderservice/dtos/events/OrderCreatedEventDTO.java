@@ -2,10 +2,12 @@ package org.insertcoin.insertcoinorderservice.dtos.events;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class OrderCreatedEventDTO {
 
-    private String orderId;
+    private UUID orderId;
+    private String OrderNumber;
     private BigDecimal amount;
     private String customerEmail;
     private String paymentMethod;
@@ -13,12 +15,20 @@ public class OrderCreatedEventDTO {
     private List<ProductDTO> products;
     private String currency;
 
-    public String getOrderId() {
+    public UUID getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(UUID orderId) {
         this.orderId = orderId;
+    }
+
+    public String getOrderNumber() {
+        return OrderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        OrderNumber = orderNumber;
     }
 
     public BigDecimal getAmount() {

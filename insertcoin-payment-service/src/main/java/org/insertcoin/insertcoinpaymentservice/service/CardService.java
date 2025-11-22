@@ -1,5 +1,6 @@
 package org.insertcoin.insertcoinpaymentservice.service;
 
+import org.insertcoin.insertcoinpaymentservice.dtos.CardPaymentCreatedDTO;
 import org.insertcoin.insertcoinpaymentservice.dtos.OrderMessageDTO;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,12 @@ public class CardService {
 
         paymentService.validateCard(order.getCard());
 
-        // createCardPayment()
-        // paymentService.createCardPayment(order);
+        CardPaymentCreatedDTO card = paymentService.createCardPayment(order);
 
         emailService.buildCardEmail(
-                order.getOrderNumber(),
-                order.getCustomerEmail(),
-                order.getAmount().doubleValue(),
+                card.orderNumber(),
+                card.customerEmail(),
+                card.amount().doubleValue(),
                 order.getProducts(),
                 order.getCurrency()
         );

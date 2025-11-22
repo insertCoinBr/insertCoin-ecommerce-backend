@@ -8,6 +8,7 @@ import org.insertcoin.insertcoinpaymentservice.repository.PaymentRepository;
 import org.insertcoin.insertcoinpaymentservice.utils.QRCodeGenerator;
 import org.springframework.stereotype.Service;
 import java.time.Year;
+import java.util.UUID;
 
 @Service
 public class PaymentService {
@@ -101,4 +102,32 @@ public class PaymentService {
         }
         return sum % 10 == 0;
     }
+
+    @Transactional
+    public CardPaymentCreatedDTO createCardPayment(OrderMessageDTO order) {
+
+        String transactionId = "TRX-" + UUID.randomUUID();
+
+        PaymentEntity payment = PaymentEntity.createCard(
+                order.getOrderId(),
+                order.getAmount(),
+                transactionId
+        );
+
+        repo.save(payment);
+
+        PaymentStatusDTO statusDTO = new PaymentStatusDTO();
+        statusDTO.setOrderId(order.getOrderId());
+        statusDTO.setStatus("PAID");
+        paymentStatusPublisher.publish(statusDTO);
+
+        return new CardPaymentCreatedDTO(
+                order.getOrderId(),
+                order.getOrderNumber(),
+                order.getCustomerEmail(),
+                transactionId,
+                order.getAmount()
+        );
+    }
+
 }

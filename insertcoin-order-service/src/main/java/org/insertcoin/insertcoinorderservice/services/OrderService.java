@@ -197,4 +197,9 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    public Page<OrderEntity> getOrdersByUserId(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.findByCustomerId(userId, pageable);
+    }
+
 }

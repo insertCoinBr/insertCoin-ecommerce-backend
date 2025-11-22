@@ -109,4 +109,26 @@ public class OrderAdminController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('ORDERS_ADMIN')")
+    @GetMapping("/ordersUser/{userId}")
+    public ResponseEntity<?> getOrdersByUserId(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        Page<OrderEntity> orders = orderService.getOrdersByUserId(userId, page, size);
+
+        Page<OrderAdminSearchResponseDTO> response = orders.map(order ->
+                new OrderAdminSearchResponseDTO(
+                        order.getId(),
+                        order.getOrderNumber(),
+                        order.getStatus().name(),
+                        order.getCreatedAt()
+                )
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }

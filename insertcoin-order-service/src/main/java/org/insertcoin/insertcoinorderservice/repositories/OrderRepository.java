@@ -16,6 +16,8 @@ public interface OrderRepository extends JpaRepository<OrderEntity, UUID> {
     Optional<OrderEntity> findByIdAndCustomerId(UUID orderId, UUID customerId);
     List<OrderEntity> findByCustomerId(UUID customerId);
 
+    Page<OrderEntity> findByCustomerId(UUID customerId, Pageable pageable);
+
     @Query("""
     SELECT o FROM OrderEntity o
     WHERE (:status IS NULL OR o.status = :status)

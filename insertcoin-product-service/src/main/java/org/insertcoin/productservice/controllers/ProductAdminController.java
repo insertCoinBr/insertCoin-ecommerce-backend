@@ -2,10 +2,13 @@ package org.insertcoin.productservice.controllers;
 
 import org.insertcoin.productservice.dtos.AddProductRequestDTO;
 import org.insertcoin.productservice.dtos.EditProductRequestDTO;
+import org.insertcoin.productservice.dtos.ProductKeyImportResponseDTO;
+import org.insertcoin.productservice.services.ProductKeyImportService;
 import org.insertcoin.productservice.services.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -14,9 +17,11 @@ import java.util.UUID;
 public class ProductAdminController {
 
     private final ProductService productService;
+    private final ProductKeyImportService importService;
 
-    public ProductAdminController(ProductService productService) {
+    public ProductAdminController(ProductService productService, ProductKeyImportService importService) {
         this.productService = productService;
+        this.importService = importService;
     }
 
     @PreAuthorize("hasAuthority('PRODUCTS_ADMIN')")
@@ -44,6 +49,17 @@ public class ProductAdminController {
     ) {
         var result = productService.updateProduct(id, dto);
         return ResponseEntity.ok(result);
+    }
+
+    @PreAuthorize("hasAuthority('PRODUCTS_ADMIN')")
+    @PostMapping("/product-keys/import")
+    public ResponseEntity<ProductKeyImportResponseDTO> importCsv(@RequestParam("file") MultipartFile file) {
+        try {
+            ProductKeyImportResponseDTO result = importService.importCsv(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            throw new RuntimeException("Error importing CSV: " + e.getMessage());
+        }
     }
 }
 

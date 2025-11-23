@@ -29,5 +29,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, UUID> {
             Pageable pageable
     );
 
+    @Query("SELECT o FROM OrderEntity o LEFT JOIN FETCH o.items WHERE o.id = :orderId")
+    Optional<OrderEntity> findByIdWithItems(@Param("orderId") UUID orderId);
 
 }

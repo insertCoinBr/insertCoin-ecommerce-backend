@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>Suas Chaves de Jogos - InsertCoin</title>
+    <style>
+        [data-ogsc] .background-dark { background-color: #0f0f23 !important; }
+        [data-ogsc] .background-card { background-color: #1a1a3e !important; }
+        [data-ogsc] .background-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+
+        @media (prefers-color-scheme: dark) {
+            .prevent-dark-mode-override {
+                color-scheme: light !important;
+            }
+        }
+    </style>
+    <!--[if mso]>
+    <style>
+        table { border-collapse: collapse; }
+        .background-dark { background-color: #0f0f23 !important; }
+        .background-card { background-color: #1a1a3e !important; }
+    </style>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #0f0f23; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" class="prevent-dark-mode-override">
+<div style="display: none; max-height: 0; overflow: hidden;">Suas chaves de jogos estão prontas! Pedido <span th:text="${orderId}">F91A718B</span></div>
+<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #0f0f23;" class="background-dark">
+    <tr>
+        <td align="center" style="padding: 40px 0;">
+            <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #1a1a3e; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);" class="background-card">
+                <!-- Header com logo/branding -->
+                <tr>
+                    <td style="padding: 40px 40px 20px 40px; text-align: center; background-color: #667eea; background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" class="background-header">
+                        <table role="presentation" style="margin: 0 auto;">
+                            <tr>
+                                <td style="background-color: rgba(255, 255, 255, 0.15); padding: 15px 30px; border-radius: 50px;">
+                                    <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: 1px;">
+                                        🎮 InsertCoin
+                                    </h1>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Conteúdo principal -->
+                <tr>
+                    <td style="padding: 40px; background-color: #1a1a3e;">
+                        <!-- Ícone de entrega -->
+                        <table role="presentation" style="margin: 0 auto 20px auto;">
+                            <tr>
+                                <td style="text-align: center;">
+                                    <div style="display: inline-block; background-color: #667eea; border-radius: 50%; width: 80px; height: 80px; line-height: 80px; text-align: center;">
+                                        <span style="font-size: 48px; vertical-align: middle;">🔑</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h2 style="margin: 0 0 10px 0; color: #ffffff; font-size: 28px; font-weight: 600; text-align: center;">
+                            Suas Chaves Estão Prontas! 🎉
+                        </h2>
+
+                        <p style="margin: 0 0 30px 0; color: #b8b8d1; font-size: 16px; line-height: 1.6; text-align: center;">
+                            Pedido <strong style="color: #667eea;" th:text="${orderId}">#F91A718B</strong>
+                        </p>
+
+                        <!-- Instruções -->
+                        <table role="presentation" style="width: 100%; margin: 0 0 30px 0;">
+                            <tr>
+                                <td style="background-color: rgba(102, 126, 234, 0.1); border-left: 4px solid #667eea; border-radius: 8px; padding: 20px;">
+                                    <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 16px; font-weight: 600;">
+                                        📋 Como usar suas chaves:
+                                    </p>
+                                    <p style="margin: 0; color: #b8b8d1; font-size: 14px; line-height: 1.6;">
+                                        Copie a chave do jogo desejado e cole na plataforma correspondente (Steam, Epic Games, Origin, etc.) para ativar seu jogo. Cada chave pode ser usada apenas uma vez.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Produtos e Chaves -->
+                        <table role="presentation" style="width: 100%; margin: 0 0 20px 0;">
+                            <tr>
+                                <td>
+                                    <p style="margin: 0 0 20px 0; color: #ffffff; font-size: 20px; font-weight: 600; text-align: center;">
+                                        🎮 Seus Jogos e Chaves
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Loop de produtos -->
+                        <table role="presentation" style="width: 100%; margin: 0 0 15px 0;" th:each="product, iterStat : ${products}">
+                            <tr>
+                                <td style="background-color: #2d2d5f; border-radius: 12px; padding: 25px;">
+                                    <!-- Nome do produto -->
+                                    <table role="presentation" style="width: 100%; margin: 0 0 20px 0;">
+                                        <tr>
+                                            <td>
+                                                <table role="presentation">
+                                                    <tr>
+                                                        <td style="vertical-align: middle; padding-right: 12px;">
+                                                            <div style="background-color: #667eea; border-radius: 8px; width: 40px; height: 40px; line-height: 40px; text-align: center; font-size: 22px;">
+                                                                🎮
+                                                            </div>
+                                                        </td>
+                                                        <td style="vertical-align: middle;">
+                                                            <p style="margin: 0; color: #ffffff; font-size: 18px; font-weight: 600;" th:text="${product.productName}">
+                                                                FIFA 24
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Loop de chaves -->
+                                    <table role="presentation" style="width: 100%;" th:each="key, keyIterStat : ${product.keys}">
+                                        <tr>
+                                            <td style="padding: 0 0 12px 0;">
+                                                <table role="presentation" style="width: 100%;">
+                                                    <tr>
+                                                        <td style="background-color: #1a1a3e; border: 2px solid #667eea; border-radius: 8px; padding: 15px;">
+                                                            <table role="presentation" style="width: 100%;">
+                                                                <tr>
+                                                                    <td style="vertical-align: middle;">
+                                                                        <p style="margin: 0 0 5px 0; color: #888899; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+                                                                            <span th:if="${#lists.size(product.keys) > 1}">Chave <span th:text="${keyIterStat.index + 1}">1</span> de <span th:text="${#lists.size(product.keys)}">2</span></span>
+                                                                            <span th:if="${#lists.size(product.keys) == 1}">Chave de Ativação</span>
+                                                                        </p>
+                                                                        <p style="margin: 0; color: #ffffff; font-size: 18px; font-weight: 600; font-family: 'Courier New', monospace; letter-spacing: 2px; word-break: break-all;" th:text="${key}">
+                                                                            E4SP-0RT5-G4M3-2024
+                                                                        </p>
+                                                                    </td>
+                                                                    <td style="width: 60px; text-align: right; vertical-align: middle;">
+                                                                        <div style="background-color: #667eea; color: #ffffff; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                                                                            📋 COPIAR
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Aviso importante -->
+                        <table role="presentation" style="width: 100%; margin: 30px 0;">
+                            <tr>
+                                <td style="background-color: rgba(255, 152, 0, 0.1); border-left: 4px solid #FF9800; border-radius: 8px; padding: 20px;">
+                                    <p style="margin: 0 0 8px 0; color: #FFB74D; font-size: 15px; font-weight: 600;">
+                                        ⚠️ Importante:
+                                    </p>
+                                    <p style="margin: 0; color: #b8b8d1; font-size: 13px; line-height: 1.6;">
+                                        Guarde este email com segurança. Não compartilhe suas chaves com outras pessoas. Após a ativação, as chaves não poderão ser reutilizadas ou reembolsadas.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Suporte -->
+                        <table role="presentation" style="width: 100%; margin: 30px 0 0 0;">
+                            <tr>
+                                <td style="background-color: rgba(33, 150, 243, 0.1); border-left: 4px solid #2196F3; border-radius: 8px; padding: 20px;">
+                                    <p style="margin: 0; color: #b8b8d1; font-size: 14px; line-height: 1.6;">
+                                        💬 Problemas com suas chaves? Entre em contato com nosso suporte através do aplicativo InsertCoin ou responda este email.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin: 25px 0 0 0; color: #8888a8; font-size: 13px; line-height: 1.5; text-align: center;">
+                            Obrigado por escolher o InsertCoin! Divirta-se! 🎮
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding: 30px 40px; background-color: #0f0f23; border-top: 1px solid #2d2d5f;">
+                        <p style="margin: 0 0 10px 0; color: #666688; font-size: 12px; text-align: center; line-height: 1.5;">
+                            © 2025 InsertCoin. Todos os direitos reservados.
+                        </p>
+                        <p style="margin: 0; color: #555566; font-size: 11px; text-align: center;">
+                            Este email contém informações importantes sobre sua compra.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -381,3 +381,20 @@ CREATE TABLE payment (
     CONSTRAINT payment_order_fk
         FOREIGN KEY (id_order) REFERENCES orders(id_order)
 );
+
+-- ============================================
+-- TABELA PRODUCT_KEY
+-- ============================================
+
+CREATE TABLE product_key (
+    id_key UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_product UUID NOT NULL,
+    key_code VARCHAR(255) UNIQUE NOT NULL,
+    status VARCHAR(50) DEFAULT 'available', -- available, assigned
+    id_order UUID,                          -- preenchido quando associada
+    sold_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_product_key_product
+        FOREIGN KEY (id_product) REFERENCES product(id_product)
+);

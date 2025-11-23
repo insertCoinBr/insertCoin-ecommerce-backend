@@ -2,11 +2,16 @@ package org.insertcoin.insertcoinorderservice.services;
 
 import org.insertcoin.insertcoinorderservice.dtos.events.OrderCreatedEventDTO;
 import org.insertcoin.insertcoinorderservice.dtos.request.OrderCreateRequestDTO;
+import org.insertcoin.insertcoinorderservice.dtos.response.AssignedKeysResponseDTO;
+import org.insertcoin.insertcoinorderservice.dtos.response.EmailMessageDTO;
 import org.insertcoin.insertcoinorderservice.entities.OrderEntity;
 import org.insertcoin.insertcoinorderservice.publisher.EmailPublisher;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
@@ -45,6 +50,27 @@ public class EmailService {
                 .toList();
         dto.setProducts(products);
 
-        publisher.publish(dto);
+        publisher.publishToPayment(dto);
+    }
+
+    public void buildDeliveryKeysEmail(
+            String customerEmail,
+            String orderNumber,
+            AssignedKeysResponseDTO keysResponse
+    ) {
+
+        EmailMessageDTO email = new EmailMessageDTO();
+        email.setType("GAME_KEYS_DELIVERY");
+        email.setTo(customerEmail);
+        email.setSubject("Suas chaves de jogos - Pedido " + orderNumber);
+        email.setTemplate("game-keys-delivery");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderId", orderNumber);
+        variables.put("products", keysResponse.getItems());
+
+        email.setVariables(variables);
+        email.setAttachments(Collections.emptyList());
+        publisher.publishToEmail(email);
     }
 }

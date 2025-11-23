@@ -9,5 +9,7 @@ import java.util.UUID;
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, UUID> {
     Optional<PaymentEntity> findByOrderId(UUID orderId);
+
+    Optional<PaymentEntity> findByPixKey(String pixKey);
 }
 

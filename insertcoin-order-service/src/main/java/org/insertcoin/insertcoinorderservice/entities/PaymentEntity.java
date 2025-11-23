@@ -10,28 +10,62 @@ import java.util.UUID;
 public class PaymentEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "id_payment", columnDefinition = "UUID")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_payment")
     private UUID id;
 
-    @Column(name = "id_order", columnDefinition = "UUID", nullable = false)
+    @Column(name = "id_order", nullable = false)
     private UUID orderId;
 
-    @Column(name = "payment_method", nullable = false)
+    @Column(name = "payment_method", columnDefinition = "TEXT", nullable = false)
     private String paymentMethod;
 
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
+    @Column(columnDefinition = "TEXT")
     private String status;
 
+    @Column(name = "transaction_id", columnDefinition = "TEXT")
     private String transactionId;
-    private String pixKey;
+
+    @Column(name = "pix_payload", columnDefinition = "TEXT")
     private String pixPayload;
 
+    @Column(name = "pix_key", columnDefinition = "TEXT")
+    private String pixKey;
+
+    @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    public PaymentEntity(
+            UUID orderId,
+            String paymentMethod,
+            BigDecimal amount,
+            String status,
+            String transactionId,
+            String pixPayload,
+            String pixKey,
+            LocalDateTime paidAt,
+            LocalDateTime createdAt
+    ) {
+        this.orderId = orderId;
+        this.paymentMethod = paymentMethod;
+        this.amount = amount;
+        this.status = status;
+        this.transactionId = transactionId;
+        this.pixPayload = pixPayload;
+        this.pixKey = pixKey;
+        this.paidAt = paidAt;
+        this.createdAt = createdAt;
+    }
+
+    public PaymentEntity() {
+
+    }
 
     public UUID getId() {
         return id;
@@ -81,20 +115,20 @@ public class PaymentEntity {
         this.transactionId = transactionId;
     }
 
-    public String getPixKey() {
-        return pixKey;
-    }
-
-    public void setPixKey(String pixKey) {
-        this.pixKey = pixKey;
-    }
-
     public String getPixPayload() {
         return pixPayload;
     }
 
     public void setPixPayload(String pixPayload) {
         this.pixPayload = pixPayload;
+    }
+
+    public String getPixKey() {
+        return pixKey;
+    }
+
+    public void setPixKey(String pixKey) {
+        this.pixKey = pixKey;
     }
 
     public LocalDateTime getPaidAt() {

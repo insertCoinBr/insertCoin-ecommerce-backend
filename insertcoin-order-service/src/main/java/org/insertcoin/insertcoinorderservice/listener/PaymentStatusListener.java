@@ -31,8 +31,7 @@ public class PaymentStatusListener {
             OrderEntity order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new RuntimeException("Pedido não encontrado: " + dto.getOrderId()));
 
-            OrderStatus status = OrderStatus.valueOf(dto.getStatus());
-            order.setStatus(status);
+            order.setStatus(OrderStatus.valueOf(dto.getStatus()));
             orderRepository.save(order);
 
             System.out.println("Pedido atualizado pelo payment-service: " + dto.getOrderId() + " -> " + dto.getStatus());

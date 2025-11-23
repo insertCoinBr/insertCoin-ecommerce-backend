@@ -21,6 +21,10 @@ public class ApiGatewayConfig {
                         .path("/products/**")
                         .uri("lb://insertcoin-product-service")
                 )
+                .route( p -> p
+                        .path("/payments/**")
+                        .uri("lb://insertcoin-payment-service")
+                )
                 .build();
     }
 }

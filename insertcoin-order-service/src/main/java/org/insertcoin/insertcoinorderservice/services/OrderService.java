@@ -6,6 +6,8 @@ import org.insertcoin.insertcoinorderservice.clients.ProductClient;
 import org.insertcoin.insertcoinorderservice.dtos.request.OrderCreateRequestDTO;
 import org.insertcoin.insertcoinorderservice.dtos.request.OrderItemRequestDTO;
 import org.insertcoin.insertcoinorderservice.dtos.response.AuthMeResponseDTO;
+import org.insertcoin.insertcoinorderservice.dtos.response.OrderNotificationDataDTO;
+import org.insertcoin.insertcoinorderservice.dtos.response.OrderProductDTO;
 import org.insertcoin.insertcoinorderservice.dtos.response.ProductResponseDTO;
 import org.insertcoin.insertcoinorderservice.entities.OrderEntity;
 import org.insertcoin.insertcoinorderservice.entities.OrderItemEntity;
@@ -200,6 +202,33 @@ public class OrderService {
     public Page<OrderEntity> getOrdersByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return orderRepository.findByCustomerId(userId, pageable);
+    }
+
+    public OrderNotificationDataDTO getNotificationData(UUID orderId) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderNotificationDataDTO dto = new OrderNotificationDataDTO();
+        dto.setOrderId(order.getId());
+        dto.setOrderNumber(order.getOrderNumber());
+        dto.setCustomerEmail(order.getCustomerEmail());
+        dto.setAmount(order.getTotalAmount());
+        dto.setCurrency("BRL");
+
+        List<OrderProductDTO> products = order.getItems().stream()
+                .map(item -> {
+                    OrderProductDTO p = new OrderProductDTO();
+                    p.setProductName(item.getProductName());
+                    p.setUnitPrice(item.getUnitPrice());
+                    p.setQuantity(item.getQuantity());
+                    p.setSubtotal(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                    return p;
+                })
+                .collect(Collectors.toList());
+
+        dto.setProducts(products);
+
+        return dto;
     }
 
 }

@@ -64,6 +64,7 @@ VALUES
   ('ORDERS_ADMIN'),         -- Gerenciar pedidos
   ('PRODUCTS_ADMIN'),       -- Gerenciar produtos
   ('PROMOTIONS_ADMIN'),     -- Gerenciar promoções
+  ('PAYMENTS_ADMIN'),       -- Gerenciar pagamentos
   ('SHOPPING_ACCESS');      -- Realizar compras
 
 -- ============================================
@@ -84,7 +85,7 @@ INSERT INTO roles_permission (id_role, id_permission)
 SELECT r.id_role, p.id_permission
 FROM roles r, permission p
 WHERE r.name = 'MANAGER_STORE'
-  AND p.name IN ('EMPLOYEES_ADMIN','CLIENTS_ADMIN','ORDERS_ADMIN', 'PRODUCTS_ADMIN', 'PROMOTIONS_ADMIN');
+  AND p.name IN ('EMPLOYEES_ADMIN','CLIENTS_ADMIN','ORDERS_ADMIN', 'PRODUCTS_ADMIN', 'PROMOTIONS_ADMIN', 'PAYMENTS_ADMIN');
 
 -- role_manager_store: Gerencia produtos, pedidos, clientes e promoções
 INSERT INTO roles_permission (id_role, id_permission)

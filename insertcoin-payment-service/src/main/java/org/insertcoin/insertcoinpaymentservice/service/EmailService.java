@@ -1,9 +1,6 @@
 package org.insertcoin.insertcoinpaymentservice.service;
 
-import org.insertcoin.insertcoinpaymentservice.dtos.EmailAttachmentDTO;
-import org.insertcoin.insertcoinpaymentservice.dtos.EmailMessageDTO;
-import org.insertcoin.insertcoinpaymentservice.dtos.ProductDTO;
-import org.insertcoin.insertcoinpaymentservice.dtos.PixPaymentCreatedDTO;
+import org.insertcoin.insertcoinpaymentservice.dtos.*;
 import org.insertcoin.insertcoinpaymentservice.publisher.EmailPublisher;
 import org.springframework.stereotype.Service;
 
@@ -59,5 +56,24 @@ public class EmailService {
 
         dto.setAttachments(Collections.emptyList());
         publisher.publish(dto);
+    }
+
+    public void buildPixPaidEmail(PixPaymentConfirmedDTO dto) {
+
+        EmailMessageDTO email = new EmailMessageDTO();
+        email.setType("PIX_PAYMENT_CONFIRMED");
+        email.setTo(dto.getCustomerEmail());
+        email.setSubject("Pagamento PIX confirmado - Pedido " + dto.getOrderNumber());
+        email.setTemplate("pix-payment-confirmed");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderId", dto.getOrderNumber());
+        variables.put("amount", dto.getAmount());
+        variables.put("currency", dto.getCurrency());
+        variables.put("products", dto.getProducts());
+
+        email.setVariables(variables);
+        email.setAttachments(Collections.emptyList());
+        publisher.publish(email);
     }
 }

@@ -1,12 +1,16 @@
 package org.insertcoin.insertcoinpaymentservice.service;
 
 import jakarta.transaction.Transactional;
+import org.insertcoin.insertcoinpaymentservice.clients.OrderClient;
 import org.insertcoin.insertcoinpaymentservice.dtos.*;
 import org.insertcoin.insertcoinpaymentservice.entity.PaymentEntity;
+import org.insertcoin.insertcoinpaymentservice.publisher.EmailPublisher;
 import org.insertcoin.insertcoinpaymentservice.publisher.PaymentStatusPublisher;
 import org.insertcoin.insertcoinpaymentservice.repository.PaymentRepository;
 import org.insertcoin.insertcoinpaymentservice.utils.QRCodeGenerator;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.UUID;
 
@@ -16,11 +20,17 @@ public class PaymentService {
     private final PaymentRepository repo;
     private final QRCodeGenerator qrCodeGenerator;
     private final PaymentStatusPublisher paymentStatusPublisher;
+    private final EmailPublisher emailPublisher;
+    private final PaymentRepository paymentRepository;
+    private final OrderClient orderClient;
 
-    public PaymentService(PaymentRepository repo, QRCodeGenerator qrCodeGenerator, PaymentStatusPublisher paymentStatusPublisher) {
+    public PaymentService(PaymentRepository repo, QRCodeGenerator qrCodeGenerator, PaymentStatusPublisher paymentStatusPublisher, EmailPublisher emailPublisher, PaymentRepository paymentRepository, OrderClient orderClient) {
         this.repo = repo;
         this.qrCodeGenerator = qrCodeGenerator;
         this.paymentStatusPublisher = paymentStatusPublisher;
+        this.emailPublisher = emailPublisher;
+        this.paymentRepository = paymentRepository;
+        this.orderClient = orderClient;
     }
 
     @Transactional
@@ -127,6 +137,42 @@ public class PaymentService {
                 order.getCustomerEmail(),
                 transactionId,
                 order.getAmount()
+        );
+    }
+
+    @Transactional
+    public PixPaymentConfirmedDTO confirmPixPayment(String pixKey) {
+
+        PaymentEntity payment = paymentRepository.findByPixKey(pixKey)
+                .orElseThrow(() -> new RuntimeException("PIX not found."));
+
+        if (!payment.getStatus().equals("WAITING_PIX_PAYMENT")) {
+            throw new RuntimeException("Payment already processed.");
+        }
+
+        payment.setStatus("PAID");
+        payment.setPaidAt(LocalDateTime.now());
+        paymentRepository.save(payment);
+
+        PaymentStatusDTO statusDTO = new PaymentStatusDTO();
+        statusDTO.setOrderId(payment.getOrderId());
+        statusDTO.setStatus("PAID");
+        paymentStatusPublisher.publish(statusDTO);
+
+        OrderNotificationDataDTO orderData =
+                orderClient.getNotificationData(payment.getOrderId());
+
+        if (orderData.getCustomerEmail() == null || orderData.getCustomerEmail().isBlank()) {
+            throw new RuntimeException("Order is missing customerEmail.");
+        }
+
+        return new PixPaymentConfirmedDTO(
+                orderData.getOrderId(),
+                orderData.getOrderNumber(),
+                orderData.getCustomerEmail(),
+                orderData.getAmount(),
+                orderData.getCurrency(),
+                orderData.getProducts()
         );
     }
 

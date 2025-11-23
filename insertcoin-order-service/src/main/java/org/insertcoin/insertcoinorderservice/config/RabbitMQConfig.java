@@ -12,9 +12,18 @@ public class RabbitMQConfig {
     public static final String PAYMENT_ROUTING_KEY = "insertcoin.payment.routingKey";
     public static final String PAYMENT_STATUS_QUEUE = "insertcoin.payment.status.queue";
 
+    // Fila do email-service
+    public static final String EMAIL_EXCHANGE = "insertcoin.email.exchange";
+    public static final String EMAIL_ROUTING_KEY = "insertcoin.email.routingKey";
+
     @Bean
     public Queue paymentQueue() {
         return new Queue(PAYMENT_QUEUE, true);
+    }
+
+    @Bean
+    public TopicExchange emailExchange() {
+        return new TopicExchange(EMAIL_EXCHANGE);
     }
 
     @Bean

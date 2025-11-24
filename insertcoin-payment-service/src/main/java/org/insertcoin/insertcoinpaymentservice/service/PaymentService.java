@@ -76,6 +76,7 @@ public class PaymentService {
 
     private void validateCard(String number, String holderName, int expiryMonth, int expiryYear, String cvv) {
 
+        /*
         if (!number.matches("\\d{13,19}")) {
             throw new RuntimeException("Número do cartão inválido.");
         }
@@ -95,6 +96,7 @@ public class PaymentService {
         if (!isValidLuhn(number)) {
             throw new RuntimeException("Cartão inválido.");
         }
+        */
     }
 
     private boolean isValidLuhn(String number) {

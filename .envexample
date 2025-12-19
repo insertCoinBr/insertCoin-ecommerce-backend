@@ -1,0 +1,12 @@
+# Banco de dados
+POSTGRES_DB=insertcoin_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+# RabbitMQ
+RABBITMQ_USER=user_rabbitmq
+RABBITMQ_PASSWORD=password_rabbitmq
+
+# E-mail
+MAIL_USERNAME=seuemail@gmail.com
+MAIL_PASSWORD=suasenha
